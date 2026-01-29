@@ -1,0 +1,258 @@
+﻿<!DOCTYPE html>
+<html lang="en" class="light scroll-smooth" dir="ltr">
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"] - User</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
+    <!-- Css -->
+    <link href="~/assets/libs/simplebar/simplebar.min.css" rel="stylesheet">
+    <link href="~/assets/libs/@@iconscout/unicons/css/line.css" type="text/css" rel="stylesheet">
+    <link href="~/assets/libs/@@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="~/assets/css/tailwind.css">
+</head>
+
+<body class="font-nunito text-base text-black dark:text-white dark:bg-slate-900">
+    <!-- Loader Start -->
+    <div id="preloader">
+        <div id="status">
+            <div class="spinner">
+                <div class="double-bounce1"></div>
+                <div class="double-bounce2"></div>
+            </div>
+        </div>
+    </div>
+    <!-- Loader End -->
+
+    <div class="page-wrapper toggled">
+        <!-- sidebar-wrapper -->
+        <nav id="sidebar" class="sidebar-wrapper sidebar-light">
+            <div class="sidebar-content">
+                <div class="sidebar-brand" style="background-color:#25159d; padding: 20px 0;">
+                    <div class="text-center">
+                       
+                        <img class="mt-3 mx-auto w-24" src="~/assets/images/kseblogo.png" />
+                    </div>
+                </div>
+
+                <ul class="sidebar-menu border-t border-white/10" data-simplebar style="height: calc(100% - 70px);">
+                    <li>
+                        <a asp-controller="Dashboard" asp-action="Index">
+                            <i class="uil uil-chart-line me-2"></i>Dashboard
+                        </a>
+                    </li>
+
+                    <!-- User Profile Dropdown -->
+                    <li class="sidebar-dropdown">
+                        <a href="javascript:void(0)">
+                            <i class="uil uil-user me-2"></i>Users
+                        </a>
+                        <div class="sidebar-submenu">
+                            <ul>
+                                <li><a href="@Url.Action("NewUser", "KSEB")">New User</a></li>
+                                <li><a href="@Url.Action("UserList", "KSEB")">User List</a></li>
+
+                                @* <li><a href="#">User list</a></li> *@
+                                <li><a href="#">Role</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Forms Dropdown -->
+                    <li class="sidebar-dropdown">
+                        <a href="javascript:void(0)"><i class="uil uil-file-alt me-2"></i>Forms</a>
+                        <div class="sidebar-submenu">
+                            <ul>
+                                <li><a href="@Url.Action("FormBuilder", "KSEB")">New Form</a></li>
+                                <li><a href="@Url.Action("FormsList", "KSEB")">Forms List</a></li>
+
+                            </ul>
+                        </div>
+                    </li>
+
+                    <!-- Forms Section with count -->
+                    @* <li class="sidebar-section mt-4 pt-4 border-t border-white/10">
+                        <div class="flex justify-between items-center px-4 py-2">
+                            <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">FORMS (4)</span>
+                        </div>
+                    </li> *@
+
+                    <!-- Include FormsSidebar partial - This will show individual forms -->
+                    @{
+                        var sidebarForms = ViewBag.SidebarForms as List<KSEB.Models.FormSummary>;
+                    }
+                    @if (sidebarForms == null)
+                    {
+                        sidebarForms = new List<KSEB.Models.FormSummary>();
+                    }
+                    @await Html.PartialAsync("FormsSidebar", sidebarForms)
+
+                </ul>
+                <!-- sidebar-menu  -->
+                <!-- Logout Button at bottom -->
+                <div class="p-4 border-t border-white/10">
+                    <a asp-controller="User" asp-action="Logout"
+                       class="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 rounded text-center hover:bg-red-700 transition-colors text-white">
+                        <i class="uil uil-sign-out-alt"></i>
+                        <span>Logout</span>
+                    </a>
+                </div>
+            </div>
+        </nav>
+        <!-- sidebar-wrapper  -->
+        <!-- Start Page Content -->
+        <main class="page-content bg-gray-50 dark:bg-slate-800">
+            <!-- Top Header -->
+            <div class="top-header">
+                <div class="header-bar flex justify-between items-center px-6 py-3">
+                    <div class="flex items-center space-x-4">
+                        <!-- show or close sidebar -->
+                        <a id="close-sidebar" class="h-8 w-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-100 dark:border-gray-800 text-slate-900 dark:text-white rounded-full" href="javascript:void(0)">
+                            <i data-feather="menu" class="h-4 w-4"></i>
+                        </a>
+
+                        <!-- Page Title -->
+                        <h1 class="text-lg font-semibold text-slate-900 dark:text-white">
+                            @ViewData["Title"]
+                        </h1>
+                    </div>
+
+                    <ul class="list-none mb-0 space-x-1">
+                        <!-- User/Profile Dropdown -->
+                        <li class="dropdown inline-block relative">
+                            <button data-dropdown-toggle="dropdown" class="dropdown-toggle items-center" type="button">
+                                <span class="h-8 w-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-100 dark:border-gray-800 text-slate-900 dark:text-white rounded-full">
+                                    <i class="uil uil-user text-sm"></i>
+                                </span>
+                                <span class="font-semibold text-[16px] ms-1 sm:inline-block hidden">Admin</span>
+                            </button>
+                            <!-- Dropdown menu -->
+                            <div class="dropdown-menu absolute end-0 m-0 mt-4 z-10 w-44 rounded-md overflow-hidden bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 hidden" onclick="event.stopPropagation();">
+                                <ul class="py-2 text-start">
+                                    <li>
+                                        <a href="profile.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-user me-2"></i>Profile</a>
+                                    </li>
+                                    @* <li>
+                                        <a href="chat.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-comment me-2"></i>Chat</a>
+                                    </li>
+                                    <li>
+                                        <a href="email.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-envelope me-2"></i>Email</a>
+                                    </li>
+                                    <li>
+                                        <a href="profile-setting.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-setting me-2"></i>Settings</a>
+                                    </li>
+                                    <li class="border-t border-gray-100 dark:border-gray-800 my-2"></li>
+                                    <li>
+                                        <a href="lock-screen.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-lock me-2"></i>Lockscreen</a>
+                                    </li> *@
+                                    <li>
+                                        <a asp-controller="KSEB"
+                                           asp-action="Logout"
+                                           class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white">
+                                            <i class="uil uil-sign-out-alt me-2"></i>Logout
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            <!-- Top Header -->
+
+            <div class="container-fluid relative px-3">
+                <div class="layout-specing">
+                    <!-- Start Content -->
+                    @RenderBody()
+                    <!-- End Content -->
+                </div>
+            </div><!--end container-->
+            <!-- Footer Start -->
+            <footer class="shadow dark:shadow-gray-700 bg-white dark:bg-slate-900 px-6 py-4">
+                <div class="container-fluid">
+                    <div class="grid grid-cols-1">
+                        <div class="sm:text-start text-center mx-md-2">
+                            <p class="mb-0 text-slate-400">
+                                © <script>document.write(new Date().getFullYear())</script>
+                                KSEBL. Designed & Developed By
+                                <a href="#" target="_blank" class="text-reset">SCS Tech India</a>.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- JAVASCRIPTS -->
+    <script src="~/assets/libs/feather-icons/feather.min.js"></script>
+    <script src="~/assets/libs/simplebar/simplebar.min.js"></script>
+    <script src="~/assets/js/plugins.init.js"></script>
+    <script src="~/assets/js/app.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize feather icons
+            if (typeof feather !== 'undefined') {
+                feather.replace();
+            }
+
+            // Hide preloader
+            setTimeout(function() {
+                const preloader = document.getElementById('preloader');
+                if (preloader) {
+                    preloader.style.display = 'none';
+                }
+            }, 500);
+
+            // Sidebar toggle
+            const closeSidebarBtn = document.getElementById('close-sidebar');
+            if (closeSidebarBtn) {
+                closeSidebarBtn.addEventListener('click', function() {
+                    document.querySelector('.page-wrapper').classList.toggle('toggled');
+                });
+            }
+
+            // Dropdown toggle
+            document.querySelectorAll('[data-dropdown-toggle="dropdown"]').forEach(function(button) {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const dropdown = this.nextElementSibling;
+                    dropdown.classList.toggle('hidden');
+                });
+            });
+
+            // Close dropdown when clicking outside
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
+                    menu.classList.add('hidden');
+                });
+            });
+
+            // Sidebar dropdown toggle
+            document.querySelectorAll('.sidebar-dropdown > a').forEach(function(dropdown) {
+                dropdown.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const parent = this.parentElement;
+                    parent.classList.toggle('active');
+
+                    // Toggle chevron icon
+                    const icon = this.querySelector('.uil');
+                    if (parent.classList.contains('active')) {
+                        if (icon.classList.contains('uil-angle-down')) {
+                            icon.classList.remove('uil-angle-down');
+                            icon.classList.add('uil-angle-up');
+                        }
+                    } else {
+                        if (icon.classList.contains('uil-angle-up')) {
+                            icon.classList.remove('uil-angle-up');
+                            icon.classList.add('uil-angle-down');
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

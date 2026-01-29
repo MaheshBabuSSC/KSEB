@@ -1,0 +1,1186 @@
+﻿@model KSEB.Models.CreateFormRequest
+
+@{
+    ViewData["Title"] = "KSEB";
+    Layout = "~/Views/Shared/_KSEBLayout.cshtml";
+
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Creative Form Builder</title>
+
+    <!-- ============================================ -->
+    <!-- EXTERNAL DEPENDENCIES -->
+    <!-- ============================================ -->
+    <!-- Tailwind CSS via CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+
+    <!-- ============================================ -->
+    <!-- CUSTOM CSS STYLES -->
+    <!-- ============================================ -->
+    <style>
+        /* Grid background pattern - dark theme default */
+        .canvas-grid {
+            background-image: linear-gradient(to right, rgba(99, 102, 241, 0.1) 1px, transparent 1px), linear-gradient(to bottom, rgba(99, 102, 241, 0.1) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Hide scrollbars */
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Smooth theme transitions */
+        * {
+            transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Component hover animations */
+        .component-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: grab;
+        }
+
+            .component-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+
+            .component-card:active {
+                cursor: grabbing;
+            }
+
+        /* Gradient backgrounds */
+        .gradient-bg-light {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .gradient-bg-warm {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .gradient-bg-cool {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        /* Drop zone styling */
+        .drop-zone {
+            min-height: 100px;
+            border: 2px dashed rgba(99, 102, 241, 0.3);
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+
+            .drop-zone.active {
+                border-color: rgba(99, 102, 241, 0.8);
+                background-color: rgba(99, 102, 241, 0.05);
+            }
+
+        /* Dragging state */
+        .dragging {
+            opacity: 0.5;
+            transform: scale(0.95);
+        }
+
+        /* Form field styling */
+        .form-field {
+            position: relative;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            background: rgba(249, 250, 251, 0.8);
+            border-radius: 0.5rem;
+            border: 1px solid rgba(209, 213, 219, 0.5);
+        }
+
+            .form-field:hover {
+                border-color: rgba(99, 102, 241, 0.5);
+            }
+
+        /* Pulse animation for active elements */
+        @@keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(99, 102, 241, 0);
+            }
+        }
+
+        .pulse-glow {
+            animation: pulse-glow 2s infinite;
+        }
+
+        /* Smooth fade-in for components */
+        @@keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .fade-in-up {
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        /* Theme toggle button animation */
+        .theme-toggle {
+            transition: transform 0.3s ease;
+        }
+
+            .theme-toggle:hover {
+                transform: rotate(180deg);
+            }
+
+        /* Success message styling */
+        .success-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        @@keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+
+<body id="body" class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900">
+
+    <!-- ============================================ -->
+    <!-- MAIN APPLICATION CONTAINER -->
+    <!-- ============================================ -->
+    <div class="flex flex-col h-screen">
+
+        <!-- ============================================ -->
+        <!-- TOP TOOLBAR / HEADER -->
+        <!-- ============================================ -->
+        <header id="header" class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-gray-200 bg-white/95 backdrop-blur-md shadow-lg z-20">
+
+            <!-- LEFT SECTION: Project Info -->
+            <div class="flex items-center gap-3 flex-wrap">
+
+                <!-- Project Name Input Field -->
+                <div class="flex items-center gap-2">
+                    <input id="formTitleInput"
+                           type="text"
+                           value="@(Model?.FormTitle ?? "New Form")"
+                           class="w-56 px-3 py-1.5 text-sm rounded-lg bg-gray-100 border-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                           placeholder="Enter form title..."
+                           required />
+                </div>
+
+                <!-- Action Buttons Group -->
+                <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
+                    <!-- Save Button -->
+                    <button type="submit"
+                            form="mainForm"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white text-xs font-medium shadow-sm transition-all"
+                            title="Save Form">
+                        <i class="fa-solid fa-floppy-disk w-4 h-4"></i>
+                        <span class="font-medium">Save Form</span>
+                    </button>
+
+                    <!-- Clear Form Button -->
+                    <button type="button"
+                            id="clearFormBtn"
+                            class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-r from-rose-500 to-pink-600 hover:from-rose-600 hover:to-pink-700 text-white text-xs font-medium shadow-sm transition-all"
+                            title="Clear All Fields">
+                        <i class="fa-solid fa-trash w-4 h-4"></i>
+                        <span class="font-medium">Clear</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- RIGHT SECTION: Theme Toggle, Description -->
+            <div class="flex items-center flex-wrap gap-2 justify-end">
+
+                <!-- Theme Toggle Button -->
+                <button id="themeToggle"
+                        class="hidden flex items-center justify-center w-9 h-9 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-700 shadow-md hover:shadow-lg theme-toggle transition-all"
+                        title="Toggle Light/Dark Theme">
+                    <i id="themeIcon" class="fa-solid fa-sun w-4 h-4"></i>
+                </button>
+
+                <!-- Created By Display -->
+                <div class="hidden px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-medium">
+                    <i class="fa-solid fa-user mr-1"></i>Created by: @(User.Identity?.Name ?? "MVC-User")
+                </div>
+            </div>
+        </header>
+
+        <!-- ============================================ -->
+        <!-- MAIN BODY: Sidebar + Canvas -->
+        <!-- ============================================ -->
+        <div class="flex flex-1 overflow-hidden min-w-0">
+
+            <!-- ============================================ -->
+            <!-- LEFT SIDEBAR: Field Components Library -->
+            <!-- ============================================ -->
+            <aside id="leftSidebar" class="w-64 flex-shrink-0 border-r border-gray-200 bg-white/95 backdrop-blur-sm flex flex-col shadow-xl transition-all duration-200 ease-in-out">
+                <!-- Sidebar Header -->
+                <div class="flex items-center justify-between px-4 py-3 border-b bg-indigo-500 to-purple-600">
+                    <h2 class="text-sm font-bold uppercase tracking-wide text-white flex items-center gap-2">
+                        <i class="fa-solid fa-puzzle-piece"></i>
+                        Form Fields
+                    </h2>
+                    <button id="collapseSidebarBtn"
+                            class="p-2 rounded-lg hover:bg-white/20 text-white transition-all"
+                            title="Collapse Sidebar">
+                        <i class="fa-solid fa-bars w-4 h-4"></i>
+                    </button>
+                </div>
+
+                <!-- Components List -->
+                <div class="flex-1 overflow-y-auto hide-scrollbar p-3 space-y-4">
+
+                    <!-- Basic Fields Section -->
+                    <div>
+                        <p class="mb-2 text-xs font-bold uppercase text-indigo-400 flex items-center gap-1">
+                            <i class="fa-solid fa-keyboard"></i>
+                            Basic Fields
+                        </p>
+                        <div class="space-y-2">
+                            <!-- Text Field Component -->
+                            <div class="component-card h-16 w-full text-left px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 hover:border-blue-500/50 text-gray-700 transition-all shadow-sm hover:shadow-blue-500/20 draggable-field"
+                                 data-field-type="text"
+                                 draggable="true"
+                                 title="Drag to add Text Field">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md shadow-blue-500/50">
+                                        <i class="fa-solid fa-font w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="font-semibold text-sm block mb-1">Text Field</span>
+                                        <span class="text-xs text-gray-500">Single line text input</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Textarea Component -->
+                            <div class="component-card h-16 w-full text-left px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 hover:border-purple-500/50 text-gray-700 transition-all shadow-sm hover:shadow-purple-500/20 draggable-field"
+                                 data-field-type="textarea"
+                                 draggable="true"
+                                 title="Drag to add Text Area">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white shadow-md shadow-purple-500/50">
+                                        <i class="fa-solid fa-align-left w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="font-semibold text-sm block mb-1">Text Area</span>
+                                        <span class="text-xs text-gray-500">Multi-line text input</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Email Field -->
+                            <div class="component-card h-16 w-full text-left px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 hover:border-amber-500/50 text-gray-700 transition-all shadow-sm hover:shadow-amber-500/20 draggable-field"
+                                 data-field-type="email"
+                                 draggable="true"
+                                 title="Drag to add Email Field">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-white shadow-md shadow-amber-500/50">
+                                        <i class="fa-solid fa-envelope w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="font-semibold text-sm block mb-1">Email Field</span>
+                                        <span class="text-xs text-gray-500">Email address input</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Specialized Fields Section -->
+                    <div>
+                        <p class="mb-2 text-xs font-bold uppercase text-indigo-400 flex items-center gap-1">
+                            <i class="fa-solid fa-sliders"></i>
+                            Specialized Fields
+                        </p>
+                        <div class="space-y-2">
+                            <!-- Number Field -->
+                            <div class="component-card h-16 w-full text-left px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 hover:border-emerald-500/50 text-gray-700 transition-all shadow-sm hover:shadow-emerald-500/20 draggable-field"
+                                 data-field-type="number"
+                                 draggable="true"
+                                 title="Drag to add Number Field">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-white shadow-md shadow-emerald-500/50">
+                                        <i class="fa-solid fa-hashtag w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="font-semibold text-sm block mb-1">Number Field</span>
+                                        <span class="text-xs text-gray-500">Numeric input</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Date Field -->
+                            <div class="component-card h-16 w-full text-left px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 hover:border-rose-500/50 text-gray-700 transition-all shadow-sm hover:shadow-rose-500/20 draggable-field"
+                                 data-field-type="date"
+                                 draggable="true"
+                                 title="Drag to add Date Field">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-white shadow-md shadow-rose-500/50">
+                                        <i class="fa-solid fa-calendar w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="font-semibold text-sm block mb-1">Date Field</span>
+                                        <span class="text-xs text-gray-500">Date picker</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Select Dropdown -->
+                            <div class="component-card h-16 w-full text-left px-4 py-3 rounded-xl bg-gray-50 border-2 border-gray-300 hover:border-cyan-500/50 text-gray-700 transition-all shadow-sm hover:shadow-cyan-500/20 draggable-field"
+                                 data-field-type="select"
+                                 draggable="true"
+                                 title="Drag to add Dropdown">
+                                <div class="flex items-start gap-3">
+                                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white shadow-md shadow-cyan-500/50">
+                                        <i class="fa-solid fa-caret-down w-5 h-5"></i>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="font-semibold text-sm block mb-1">Dropdown</span>
+                                        <span class="text-xs text-gray-500">Select from options</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Form Description -->
+                    <div class="mt-6 p-4 rounded-xl bg-gradient-to-br from-indigo-900/30 to-purple-900/30 border border-indigo-500/20">
+                        <h4 class="text-xs font-bold uppercase text-indigo-400 mb-2 flex items-center gap-1">
+                            <i class="fa-solid fa-circle-info"></i>
+                            Instructions
+                        </h4>
+                        <p class="text-xs text-gray-600">
+                            Drag fields to the canvas to build your form. Click on fields to edit properties.
+                        </p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Collapsed Sidebar Expand Button -->
+            <button id="expandSidebarBtn"
+                    class="hidden items-center justify-center w-8 bg-gray-100 hover:bg-gray-200 text-indigo-600 border-r border-gray-300 shadow-sm transition-all"
+                    title="Expand Sidebar">
+                <i class="fa-solid fa-chevron-right w-4 h-4"></i>
+            </button>
+
+            <!-- ============================================ -->
+            <!-- CENTER CANVAS AREA -->
+            <!-- ============================================ -->
+            <main class="flex-1 min-w-0 overflow-auto hide-scrollbar">
+                <!-- Success Message -->
+                @if (ViewBag.Message != null)
+                {
+                    <div class="success-message px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg flex items-center gap-2">
+                        <i class="fa-solid fa-check-circle"></i>
+                        @ViewBag.Message
+                    </div>
+                }
+
+                <form id="mainForm" method="post" class="h-full">
+                    <!-- HIDDEN INPUTS for form metadata -->
+                    <input type="hidden" name="FormTitle" id="hiddenFormTitle" value="@Model?.FormTitle" />
+                    <input type="hidden" name="FormDescription" id="hiddenFormDescription" value="@Model?.FormDescription" />
+
+                    <div id="canvas" class="relative h-full min-h-[calc(100vh-64px)] p-8 bg-white canvas-grid transition-colors duration-200">
+
+                        <!-- Empty State Message -->
+                        <div id="canvasEmptyState" class="flex flex-col items-center justify-center p-12 text-center transition-all duration-700 ease-out" style="@(Model?.Fields?.Any() == true ? "display: none;" : "")">
+                            @* <div class="relative mb-8 h-32 w-48">
+                                <div class="absolute inset-0 translate-x-4 -translate-y-3 rounded-xl border-2 border-indigo-500/30 bg-gray-100/50 shadow-lg shadow-indigo-500/20 backdrop-blur-sm transition-transform duration-500">
+                                    <div class="m-3 h-2 w-1/2 rounded-full bg-indigo-500/30"></div>
+                                    <div class="mx-3 mt-4 space-y-2">
+                                        <div class="h-1.5 w-full rounded-full bg-indigo-500/20"></div>
+                                        <div class="h-1.5 w-3/4 rounded-full bg-indigo-500/20"></div>
+                                    </div>
+                                </div>
+                            </div> *@
+
+                            @* <h2 class="mb-3 text-2xl font-extrabold tracking-tight text-gray-900">
+                                Start Building Your Form
+                            </h2>
+
+                            <p class="max-w-md text-sm leading-relaxed text-gray-600 mb-6">
+                                Drag form fields from the sidebar to create your custom form.
+                            </p> *@
+
+                            <!-- Form Description Input -->
+                            <div class="w-full max-w-md">
+                                @* <label class="block text-sm font-medium text-gray-700 mb-2">
+                                    <i class="fa-solid fa-align-left mr-2"></i>Form Description
+                                </label> *@
+                                <textarea id="descriptionTextarea"
+                                          class="w-full px-4 py-3 rounded-lg bg-white border-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+                                          rows="1"
+                                          placeholder="Describe what this form is for...">@Model?.FormDescription</textarea>
+                            </div>
+                        </div>
+
+                        <!-- Form Canvas Container -->
+                        <div id="formCanvas" class="relative max-w-3xl mx-auto flex flex-col gap-6 drop-zone">
+                            @* <h3 class="mb-3 text-2xl font-bold tracking-tight text-gray-900 text-center">
+                                Start Building Your Form
+                            </h3> *@    
+                            <!-- Existing fields will be rendered here -->
+                            @if (Model?.Fields != null && Model.Fields.Any())
+                            {
+                                @for (int i = 0; i < Model.Fields.Count; i++)
+                                {
+                                    <div class="form-field fade-in-up" data-index="@i" data-field-type="@Model.Fields[i].FieldType">
+                                        <div class="flex items-center justify-between mb-3">
+                                            <span class="text-xs font-bold uppercase tracking-wide text-indigo-400 flex items-center gap-2">
+                                                <i class="fa-solid fa-cube"></i>
+                                                @Model.Fields[i].FieldType Field
+                                            </span>
+                                            <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                <button type="button" class="field-settings-btn w-6 h-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs flex items-center justify-center hover:scale-110 transition-all" title="Edit Field">
+                                                    <i class="fa-solid fa-gear"></i>
+                                                </button>
+                                                <button type="button" class="field-delete-btn w-6 h-6 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white text-xs flex items-center justify-center hover:scale-110 transition-all" title="Delete Field">
+                                                    <i class="fa-solid fa-xmark"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <div class="space-y-4">
+                                            <div>
+                                                <label class="block text-xs font-medium text-gray-700 mb-2">Field Label</label>
+                                                <input type="text"
+                                                       name="Fields[@i].FieldName"
+                                                       value="@Model.Fields[i].FieldName"
+                                                       class="field-label w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                       placeholder="Enter field label"
+                                                       required />
+                                            </div>
+
+                                            @if (Model.Fields[i].FieldType == "textarea")
+                                            {
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-2">Field Value</label>
+                                                    <textarea class="w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                  rows="3"
+                                                  disabled
+                                                  placeholder="Text area content will appear here"></textarea>
+                                                </div>
+                                            }
+                                            else if (Model.Fields[i].FieldType == "select")
+                                            {
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-2">Options (comma separated)</label>
+                                                    <input type="text"
+                                                           name="Fields[@i].Options"
+                                                           value="@Model.Fields[i].Options"
+                                                           class="field-options w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                           placeholder="Option 1, Option 2, Option 3" />
+                                                </div>
+                                            }
+                                            else
+                                            {
+                                                <div>
+                                                    <label class="block text-xs font-medium text-gray-700 mb-2">Field Preview</label>
+                                                    <input type="@Model.Fields[i].FieldType"
+                                                           class="w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                                           disabled
+                                                           placeholder="@Model.Fields[i].FieldType input" />
+                                                </div>
+                                            }
+
+                                            <input type="hidden" name="Fields[@i].FieldType" value="@Model.Fields[i].FieldType" />
+                                            <input type="hidden" name="Fields[@i].FieldOrder" value="@i" class="field-order" />
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        </div>
+                    </div>
+                </form>
+            </main>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- FIELD SETTINGS MODAL -->
+    <!-- ============================================ -->
+    <div id="fieldSettingsModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 hidden">
+        <div class="bg-gray-100 border-2 border-gray-300 rounded-2xl shadow-2xl w-full max-w-md p-6">
+            <h2 class="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+                <i class="fa-solid fa-gear"></i>
+                Field Settings
+            </h2>
+
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-2">Field Type</label>
+                    <select id="fieldTypeSelect" class="w-full px-3 py-2 border-2 border-gray-300 bg-white text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
+                        <option value="text">Text Field</option>
+                        <option value="textarea">Text Area</option>
+                        <option value="email">Email Field</option>
+                        <option value="number">Number Field</option>
+                        <option value="date">Date Field</option>
+                        <option value="select">Dropdown</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-2">Required Field</label>
+                    <div class="flex items-center gap-2">
+                        <input type="checkbox" id="fieldRequired" class="w-4 h-4 rounded border-gray-300 bg-white text-indigo-500 focus:ring-indigo-500 focus:ring-offset-gray-100">
+                        <span class="text-sm text-gray-700">This field is required</span>
+                    </div>
+                </div>
+
+                <div id="optionsContainer" class="hidden">
+                    <label class="block text-xs font-semibold text-gray-700 mb-2">Dropdown Options</label>
+                    <textarea id="fieldOptions"
+                              rows="3"
+                              class="w-full px-3 py-2 border-2 border-gray-300 bg-white text-gray-900 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-y"
+                              placeholder="Enter options, one per line"></textarea>
+                </div>
+            </div>
+
+            <div class="flex gap-3 justify-end mt-6">
+                <button id="fieldSettingsCancel"
+                        type="button"
+                        class="px-4 py-2 rounded-lg bg-gray-300 hover:bg-gray-400 text-gray-800 transition-colors">
+                    Cancel
+                </button>
+                <button id="fieldSettingsSave"
+                        type="button"
+                        class="px-4 py-2 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 hover:from-indigo-600 hover:to-purple-700 text-white transition-colors">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================ -->
+    <!-- JAVASCRIPT -->
+    <!-- ============================================ -->
+    <script>
+        // ============================================
+        // DOM ELEMENT REFERENCES
+        // ============================================
+        const body = document.getElementById("body");
+        const canvas = document.getElementById("canvas");
+        const formCanvas = document.getElementById("formCanvas");
+        const canvasEmptyState = document.getElementById("canvasEmptyState");
+        const themeToggle = document.getElementById("themeToggle");
+        const themeIcon = document.getElementById("themeIcon");
+        const collapseSidebarBtn = document.getElementById("collapseSidebarBtn");
+        const expandSidebarBtn = document.getElementById("expandSidebarBtn");
+        const leftSidebar = document.getElementById("leftSidebar");
+        const clearFormBtn = document.getElementById("clearFormBtn");
+        const descriptionTextarea = document.getElementById("descriptionTextarea");
+        const formTitleInput = document.getElementById("formTitleInput");
+        const hiddenFormTitle = document.getElementById("hiddenFormTitle");
+        const hiddenFormDescription = document.getElementById("hiddenFormDescription");
+        const mainForm = document.getElementById("mainForm");
+        const fieldSettingsModal = document.getElementById("fieldSettingsModal");
+        const fieldTypeSelect = document.getElementById("fieldTypeSelect");
+        const fieldRequired = document.getElementById("fieldRequired");
+        const optionsContainer = document.getElementById("optionsContainer");
+        const fieldOptions = document.getElementById("fieldOptions");
+        const fieldSettingsCancel = document.getElementById("fieldSettingsCancel");
+        const fieldSettingsSave = document.getElementById("fieldSettingsSave");
+
+        // ============================================
+        // APPLICATION STATE
+        // ============================================
+        let isLightTheme = true;
+        let currentFieldIndex = 0;
+        let editingField = null;
+        let draggedField = null;
+
+        // ============================================
+        // THEME MANAGEMENT
+        // ============================================
+        function toggleTheme() {
+            isLightTheme = !isLightTheme;
+
+            if (isLightTheme) {
+                // Apply light theme
+                body.className = "min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900";
+                canvas.className = "relative h-full min-h-[calc(100vh-64px)] p-8 bg-white canvas-grid transition-colors duration-200";
+                leftSidebar.className = "w-64 flex-shrink-0 border-r border-gray-200 bg-white/95 backdrop-blur-sm flex flex-col shadow-xl transition-all duration-200 ease-in-out";
+                themeIcon.className = "fa-solid fa-sun w-4 h-4";
+
+                // Update header
+                const header = document.getElementById('header');
+                header.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-gray-200 bg-white/95 backdrop-blur-md shadow-lg z-20";
+
+                // Update form title input
+                if (formTitleInput) {
+                    formTitleInput.className = "w-56 px-3 py-1.5 text-sm rounded-lg bg-gray-100 border-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all";
+                }
+
+                // Update field settings modal
+                const modalContent = fieldSettingsModal.querySelector('div');
+                if (modalContent) {
+                    modalContent.className = "bg-gray-100 border-2 border-gray-300 rounded-2xl shadow-2xl w-full max-w-md p-6";
+                }
+
+            } else {
+                // Apply dark theme
+                body.className = "min-h-screen bg-slate-950 text-slate-100";
+                canvas.className = "relative h-full min-h-[calc(100vh-64px)] p-8 bg-slate-950 canvas-grid transition-colors duration-200";
+                leftSidebar.className = "w-64 flex-shrink-0 border-r border-slate-800 bg-slate-950/95 backdrop-blur-sm flex flex-col shadow-xl transition-all duration-200 ease-in-out";
+                themeIcon.className = "fa-solid fa-moon w-4 h-4";
+
+                // Update header
+                const header = document.getElementById('header');
+                header.className = "flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 px-4 sm:px-6 py-3 border-b border-slate-800 bg-slate-900/95 backdrop-blur-md shadow-lg z-20";
+
+                // Update form title input
+                if (formTitleInput) {
+                    formTitleInput.className = "w-56 px-3 py-1.5 text-sm rounded-lg bg-slate-800 border-2 border-slate-700 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all";
+                }
+
+                // Update field settings modal
+                const modalContent = fieldSettingsModal.querySelector('div');
+                if (modalContent) {
+                    modalContent.className = "bg-slate-800 border-2 border-slate-700 rounded-2xl shadow-2xl w-full max-w-md p-6";
+                }
+            }
+
+            updateFieldCardsTheme();
+        }
+
+        function updateFieldCardsTheme() {
+            const fieldCards = document.querySelectorAll('.component-card, .form-field');
+            fieldCards.forEach(card => {
+                if (isLightTheme) {
+                    card.className = card.className
+                        .replace(/bg-slate-900\/80/g, 'bg-gray-50')
+                        .replace(/border-slate-700/g, 'border-gray-300')
+                        .replace(/text-slate-200/g, 'text-gray-700')
+                        .replace(/text-slate-400/g, 'text-gray-500')
+                        .replace(/bg-slate-900/g, 'bg-gray-100')
+                        .replace(/bg-slate-800/g, 'bg-gray-200');
+                } else {
+                    card.className = card.className
+                        .replace(/bg-gray-50/g, 'bg-slate-900/80')
+                        .replace(/border-gray-300/g, 'border-slate-700')
+                        .replace(/text-gray-700/g, 'text-slate-200')
+                        .replace(/text-gray-500/g, 'text-slate-400')
+                        .replace(/bg-gray-100/g, 'bg-slate-900')
+                        .replace(/bg-gray-200/g, 'bg-slate-800');
+                }
+            });
+        }
+
+        // ============================================
+        // FORM FIELD MANAGEMENT
+        // ============================================
+        function createFieldElement(fieldType, fieldName = '', index = null) {
+            if (index === null) {
+                index = document.querySelectorAll('.form-field').length;
+            }
+
+            const fieldElement = document.createElement('div');
+            fieldElement.className = 'form-field fade-in-up';
+            fieldElement.dataset.index = index;
+            fieldElement.dataset.fieldType = fieldType;
+
+            let fieldContent = '';
+
+            if (fieldType === 'textarea') {
+                fieldContent = `
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-2">Field Label</label>
+                            <input
+                                type="text"
+                                name="Fields[${index}].FieldName"
+                                value="${fieldName || 'Text Area'}"
+                                class="field-label w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter field label"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-2">Field Value</label>
+                            <textarea
+                                class="w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                rows="3"
+                                disabled
+                                placeholder="Text area content will appear here"
+                            ></textarea>
+                        </div>
+                    </div>
+                `;
+            } else if (fieldType === 'select') {
+                fieldContent = `
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-2">Field Label</label>
+                            <input
+                                type="text"
+                                name="Fields[${index}].FieldName"
+                                value="${fieldName || 'Dropdown'}"
+                                class="field-label w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter field label"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-2">Options (comma separated)</label>
+                            <input
+                                type="text"
+                                name="Fields[${index}].Options"
+                                class="field-options w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Option 1, Option 2, Option 3"
+                            />
+                        </div>
+                    </div>
+                `;
+            } else {
+                fieldContent = `
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-2">Field Label</label>
+                            <input
+                                type="text"
+                                name="Fields[${index}].FieldName"
+                                value="${fieldName || fieldType.charAt(0).toUpperCase() + fieldType.slice(1)}"
+                                class="field-label w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                placeholder="Enter field label"
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label class="block text-xs font-medium text-gray-700 mb-2">Field Preview</label>
+                            <input
+                                type="${fieldType}"
+                                class="w-full px-3 py-2 bg-gray-100 border-2 border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+                                disabled
+                                placeholder="${fieldType} input"
+                            />
+                        </div>
+                    </div>
+                `;
+            }
+
+            fieldElement.innerHTML = `
+                <div class="flex items-center justify-between mb-3">
+                    <span class="text-xs font-bold uppercase tracking-wide text-indigo-400 flex items-center gap-2">
+                        <i class="fa-solid fa-cube"></i>
+                        ${fieldType} Field
+                    </span>
+                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <button type="button" class="field-settings-btn w-6 h-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs flex items-center justify-center hover:scale-110 transition-all" title="Edit Field">
+                            <i class="fa-solid fa-gear"></i>
+                        </button>
+                        <button type="button" class="field-delete-btn w-6 h-6 rounded-full bg-gradient-to-r from-rose-500 to-pink-600 text-white text-xs flex items-center justify-center hover:scale-110 transition-all" title="Delete Field">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+                ${fieldContent}
+                <input type="hidden" name="Fields[${index}].FieldType" value="${fieldType}" />
+                <input type="hidden" name="Fields[${index}].FieldOrder" value="${index}" class="field-order" />
+            `;
+
+            return fieldElement;
+        }
+
+        function addFieldToCanvas(fieldType) {
+            const fieldElement = createFieldElement(fieldType);
+            formCanvas.appendChild(fieldElement);
+            updateFieldIndexes();
+            updateEmptyState();
+            attachFieldEvents(fieldElement);
+
+            // Scroll to new field
+            fieldElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function updateFieldIndexes() {
+            const fields = formCanvas.querySelectorAll('.form-field');
+            fields.forEach((field, index) => {
+                field.dataset.index = index;
+
+                // Update all inputs within the field
+                const inputs = field.querySelectorAll('input, select, textarea');
+                inputs.forEach(input => {
+                    if (input.name) {
+                        input.name = input.name.replace(/Fields\[\d+\]/, `Fields[${index}]`);
+                    }
+                });
+
+                // Update order hidden field
+                const orderInput = field.querySelector('.field-order');
+                if (orderInput) {
+                    orderInput.value = index;
+                }
+            });
+        }
+
+        function updateEmptyState() {
+            const hasFields = formCanvas.querySelectorAll('.form-field').length > 0;
+            if (hasFields) {
+                canvasEmptyState.style.display = 'none';
+            } else {
+                canvasEmptyState.style.display = 'flex';
+            }
+        }
+
+        function clearForm() {
+            if (!confirm('Are you sure you want to clear all form fields?')) return;
+            formCanvas.innerHTML = '';
+            updateEmptyState();
+        }
+
+        function openFieldSettings(fieldElement) {
+            editingField = fieldElement;
+            const fieldType = fieldElement.dataset.fieldType;
+            const fieldLabel = fieldElement.querySelector('.field-label')?.value || '';
+            const fieldOptions = fieldElement.querySelector('.field-options')?.value || '';
+
+            fieldTypeSelect.value = fieldType;
+            fieldOptions.value = fieldOptions;
+
+            // Show/hide options container
+            optionsContainer.classList.toggle('hidden', fieldType !== 'select');
+
+            fieldSettingsModal.classList.remove('hidden');
+        }
+
+        function saveFieldSettings() {
+            if (!editingField) return;
+
+            const newType = fieldTypeSelect.value;
+            const options = fieldOptions.value;
+
+            // Update field type
+            editingField.dataset.fieldType = newType;
+
+            // Update hidden field type input
+            const typeInput = editingField.querySelector('input[type="hidden"][name$="FieldType"]');
+            if (typeInput) {
+                typeInput.value = newType;
+            }
+
+            // Update options if select field
+            if (newType === 'select') {
+                const optionsInput = editingField.querySelector('.field-options');
+                if (optionsInput) {
+                    optionsInput.value = options;
+                }
+            }
+
+            // Update preview
+            const previewInput = editingField.querySelector('input[type]:not([type="hidden"])');
+            if (previewInput && newType !== 'textarea' && newType !== 'select') {
+                previewInput.type = newType;
+                previewInput.placeholder = `${newType} input`;
+            }
+
+            fieldSettingsModal.classList.add('hidden');
+            editingField = null;
+        }
+
+        // ============================================
+        // FORM VALIDATION AND SUBMISSION
+        // ============================================
+        function validateForm() {
+            // Update hidden fields before submission
+            hiddenFormTitle.value = formTitleInput.value;
+            hiddenFormDescription.value = descriptionTextarea.value;
+
+            // Validate form title
+            if (!formTitleInput.value.trim()) {
+                alert('Form title is required!');
+                formTitleInput.focus();
+                return false;
+            }
+
+            // Validate form description
+            if (!descriptionTextarea.value.trim()) {
+                alert('Form description is required!');
+                descriptionTextarea.focus();
+                return false;
+            }
+
+            // Validate field labels
+            const fieldLabels = document.querySelectorAll('.field-label');
+            for (let label of fieldLabels) {
+                if (!label.value.trim()) {
+                    alert('All field labels are required!');
+                    label.focus();
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        // ============================================
+        // DRAG AND DROP FUNCTIONALITY
+        // ============================================
+        function initializeDragAndDrop() {
+            // Draggable field components
+            document.querySelectorAll('.draggable-field').forEach(field => {
+                field.addEventListener('dragstart', handleDragStart);
+                field.addEventListener('dragend', handleDragEnd);
+            });
+
+            // Drop zone
+            formCanvas.addEventListener('dragover', handleDragOver);
+            formCanvas.addEventListener('dragleave', handleDragLeave);
+            formCanvas.addEventListener('drop', handleDrop);
+
+            // Make existing fields sortable
+            makeFieldsSortable();
+        }
+
+        function handleDragStart(e) {
+            draggedField = this;
+            this.classList.add('dragging');
+            e.dataTransfer.setData('text/plain', this.dataset.fieldType);
+            e.dataTransfer.effectAllowed = 'copy';
+        }
+
+        function handleDragEnd() {
+            this.classList.remove('dragging');
+            draggedField = null;
+            formCanvas.classList.remove('active');
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            e.dataTransfer.dropEffect = 'copy';
+            formCanvas.classList.add('active');
+        }
+
+        function handleDragLeave() {
+            formCanvas.classList.remove('active');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            formCanvas.classList.remove('active');
+
+            const fieldType = e.dataTransfer.getData('text/plain');
+            if (fieldType) {
+                addFieldToCanvas(fieldType);
+            }
+        }
+
+        function makeFieldsSortable() {
+            let draggedItem = null;
+
+            formCanvas.querySelectorAll('.form-field').forEach(field => {
+                field.setAttribute('draggable', 'true');
+
+                field.addEventListener('dragstart', function(e) {
+                    draggedItem = this;
+                    this.classList.add('dragging');
+                    setTimeout(() => this.style.display = 'none', 0);
+                });
+
+                field.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                    this.style.display = '';
+                    draggedItem = null;
+                    updateFieldIndexes();
+                });
+            });
+
+            formCanvas.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                const afterElement = getDragAfterElement(formCanvas, e.clientY);
+                if (draggedItem) {
+                    if (afterElement) {
+                        formCanvas.insertBefore(draggedItem, afterElement);
+                    } else {
+                        formCanvas.appendChild(draggedItem);
+                    }
+                }
+            });
+
+            function getDragAfterElement(container, y) {
+                const draggableElements = [...container.querySelectorAll('.form-field:not(.dragging)')];
+
+                return draggableElements.reduce((closest, child) => {
+                    const box = child.getBoundingClientRect();
+                    const offset = y - box.top - box.height / 2;
+
+                    if (offset < 0 && offset > closest.offset) {
+                        return { offset: offset, element: child };
+                    } else {
+                        return closest;
+                    }
+                }, { offset: Number.NEGATIVE_INFINITY }).element;
+            }
+        }
+
+        // ============================================
+        // EVENT LISTENER ATTACHMENT
+        // ============================================
+        function attachFieldEvents(fieldElement) {
+            // Settings button
+            const settingsBtn = fieldElement.querySelector('.field-settings-btn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', () => openFieldSettings(fieldElement));
+            }
+
+            // Delete button
+            const deleteBtn = fieldElement.querySelector('.field-delete-btn');
+            if (deleteBtn) {
+                deleteBtn.addEventListener('click', () => {
+                    fieldElement.remove();
+                    updateFieldIndexes();
+                    updateEmptyState();
+                });
+            }
+
+            // Make field draggable for sorting
+            fieldElement.setAttribute('draggable', 'true');
+            fieldElement.addEventListener('dragstart', function(e) {
+                this.classList.add('dragging');
+                setTimeout(() => this.style.display = 'none', 0);
+            });
+
+            fieldElement.addEventListener('dragend', function() {
+                this.classList.remove('dragging');
+                this.style.display = '';
+                updateFieldIndexes();
+            });
+        }
+
+        function attachExistingFieldEvents() {
+            document.querySelectorAll('.form-field').forEach(field => {
+                attachFieldEvents(field);
+            });
+        }
+
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        themeToggle.addEventListener('click', toggleTheme);
+
+        if (collapseSidebarBtn) {
+            collapseSidebarBtn.addEventListener('click', function() {
+                leftSidebar.classList.add('hidden');
+                expandSidebarBtn.classList.remove('hidden');
+                expandSidebarBtn.classList.add('flex');
+            });
+        }
+
+        if (expandSidebarBtn) {
+            expandSidebarBtn.addEventListener('click', function() {
+                leftSidebar.classList.remove('hidden');
+                expandSidebarBtn.classList.add('hidden');
+                expandSidebarBtn.classList.remove('flex');
+            });
+        }
+
+        clearFormBtn.addEventListener('click', clearForm);
+
+        // Update hidden form title when user types
+        formTitleInput.addEventListener('input', function() {
+            hiddenFormTitle.value = this.value;
+        });
+
+        // Update hidden form description when user types
+        descriptionTextarea.addEventListener('input', function() {
+            hiddenFormDescription.value = this.value;
+        });
+
+        fieldTypeSelect.addEventListener('change', function() {
+            optionsContainer.classList.toggle('hidden', this.value !== 'select');
+        });
+
+        fieldSettingsCancel.addEventListener('click', function() {
+            fieldSettingsModal.classList.add('hidden');
+            editingField = null;
+        });
+
+        fieldSettingsSave.addEventListener('click', saveFieldSettings);
+
+        fieldSettingsModal.addEventListener('click', function(e) {
+            if (e.target === fieldSettingsModal) {
+                fieldSettingsModal.classList.add('hidden');
+                editingField = null;
+            }
+        });
+
+        // Form submission validation
+        mainForm.addEventListener('submit', function(e) {
+            if (!validateForm()) {
+                e.preventDefault();
+                return false;
+            }
+            return true;
+        });
+
+        // Close success message after 5 seconds
+        setTimeout(() => {
+            const successMessage = document.querySelector('.success-message');
+            if (successMessage) {
+                successMessage.style.transition = 'opacity 0.5s ease';
+                successMessage.style.opacity = '0';
+                setTimeout(() => successMessage.remove(), 500);
+            }
+        }, 5000);
+
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        function initialize() {
+            // Apply light theme on page load
+            if (isLightTheme) {
+                updateFieldCardsTheme();
+            }
+
+            initializeDragAndDrop();
+            attachExistingFieldEvents();
+            updateEmptyState();
+
+            // Auto-hide success message after 5 seconds
+            const successMessage = document.querySelector('.success-message');
+            if (successMessage) {
+                setTimeout(() => {
+                    successMessage.style.transition = 'opacity 0.5s ease';
+                    successMessage.style.opacity = '0';
+                    setTimeout(() => successMessage.remove(), 500);
+                }, 5000);
+            }
+        }
+
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>

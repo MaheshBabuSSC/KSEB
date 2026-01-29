@@ -1,0 +1,51 @@
+﻿@* Views/Shared/FormsSidebar.cshtml *@
+@model List<KSEB.Models.FormSummary>
+
+@if (Model != null && Model.Any())
+{
+    <div class="space-y-1">
+        <div class="flex items-center justify-between w-full px-4 py-2 rounded hover:bg-indigo-800 transition-colors cursor-pointer"
+             onclick="toggleForms()">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-file-lines w-5 h-5"></i>
+                <span>📄 Forms (@Model.Count)</span>
+            </div>
+            <i class="fa-solid fa-chevron-down transition-transform duration-200" id="forms-arrow"></i>
+        </div>
+
+        <div id="forms-list" class="ml-8 space-y-1 max-h-60 overflow-y-auto" style="display: block;">
+            @foreach (var form in Model)
+            {
+                <a asp-controller="Dashboard"
+                   asp-action="Submit"
+                   asp-route-id="@form.FormId"
+                   class="flex items-center gap-2 px-3 py-2 rounded hover:bg-indigo-700/50 text-sm transition-colors group">
+                    <i class="fa-solid fa-file text-xs @(form.IsActive ? "text-green-400" : "text-gray-400")"></i>
+                    <span class="truncate flex-1">@form.FormTitle</span>
+                </a>
+            }
+        </div>
+    </div>
+
+    <script>
+        function toggleForms() {
+            const formsList = document.getElementById('forms-list');
+            const arrow = document.getElementById('forms-arrow');
+
+            if (formsList.style.display === 'none') {
+                formsList.style.display = 'block';
+                arrow.style.transform = 'rotate(180deg)';
+            } else {
+                formsList.style.display = 'none';
+                arrow.style.transform = 'rotate(0deg)';
+            }
+        }
+    </script>
+}
+else
+{
+    <div class="flex items-center gap-3 px-4 py-2 rounded text-indigo-200/50">
+        <i class="fa-solid fa-file-lines w-5 h-5"></i>
+        <span>📄 Forms (0)</span>
+    </div>
+}
