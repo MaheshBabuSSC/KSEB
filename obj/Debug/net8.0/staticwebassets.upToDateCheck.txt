@@ -1,3 +1,13 @@
+wwwroot\assets\css\site.css
+wwwroot\assets\css\tailwind.css
+wwwroot\assets\css\tailwind.min.css
+wwwroot\assets\css\tailwind.min.css.map
+wwwroot\assets\fonts\ajax-loader.gif
+wwwroot\assets\fonts\materialdesignicons-webfont.eot
+wwwroot\assets\fonts\materialdesignicons-webfont.svg
+wwwroot\assets\fonts\materialdesignicons-webfont.ttf
+wwwroot\assets\fonts\materialdesignicons-webfont.woff
+wwwroot\assets\fonts\materialdesignicons-webfont.woff2
 wwwroot\assets\images\bg-chat.png
 wwwroot\assets\images\blog\01.jpg
 wwwroot\assets\images\blog\02.jpg
@@ -92,6 +102,11 @@ wwwroot\assets\images\shop\single\single-5.jpg
 wwwroot\assets\images\shop\single\single-6.jpg
 wwwroot\assets\images\shree-276.png
 wwwroot\assets\images\utility.jpg
+wwwroot\assets\js\apexchart.init.js
+wwwroot\assets\js\app.js
+wwwroot\assets\js\fullcalendar.init.js
+wwwroot\assets\js\jsvectormap.init.js
+wwwroot\assets\js\plugins.init.js
 wwwroot\assets\libs\@ckeditor\ckeditor5-build-classic\build\ckeditor.js
 wwwroot\assets\libs\@ckeditor\ckeditor5-build-classic\build\translations\af.js
 wwwroot\assets\libs\@ckeditor\ckeditor5-build-classic\build\translations\ar.js

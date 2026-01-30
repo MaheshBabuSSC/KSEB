@@ -1,58 +1,10 @@
-/* wwwroot/css/site.css */
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-/* Custom KSEB Components */
+/* Using standard Tailwind colors first */
 @layer components {
     .btn-kseb {
-        @apply bg-kseb-blue text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-900 transition duration-200 shadow-md hover:shadow-lg;
-    }
-
-    .btn-kseb-secondary {
-        @apply bg-white text-kseb-blue px-6 py-3 rounded-lg font-semibold border-2 border-kseb-blue hover:bg-blue-50 transition duration-200;
-    }
-
-    .card-kseb {
-        @apply bg-white rounded-xl shadow-lg p-6 border border-gray-200 hover:shadow-xl transition duration-300;
-    }
-
-    .input-kseb {
-        @apply w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-kseb-blue focus:border-transparent transition duration-200;
-    }
-
-    .badge-paid {
-        @apply px-3 py-1 rounded-full text-xs font-bold bg-green-100 text-green-800;
-    }
-
-    .badge-pending {
-        @apply px-3 py-1 rounded-full text-xs font-bold bg-yellow-100 text-yellow-800;
-    }
-
-    .badge-overdue {
-        @apply px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800;
-    }
-
-    .nav-link {
-        @apply text-gray-700 hover:text-kseb-blue px-4 py-2 rounded-md hover:bg-blue-50 transition duration-200 font-medium;
-    }
-}
-
-/* Custom Base Styles */
-@layer base {
-    h1 {
-        @apply text-4xl font-bold text-gray-900 mb-4;
-    }
-
-    h2 {
-        @apply text-2xl font-semibold text-gray-800 mb-3;
-    }
-
-    h3 {
-        @apply text-xl font-semibold text-gray-700 mb-2;
-    }
-
-    a {
-        @apply text-kseb-blue hover:text-blue-800 transition duration-200;
+        @apply bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg;
     }
 }

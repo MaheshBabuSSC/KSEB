@@ -1,9 +1,12 @@
 ﻿@model KSEB.Models.CreateFormRequest
-
 @{
-    ViewData["Title"] = "KSEB";
+    ViewData["Title"] = ViewBag.IsEditMode == true ? "Edit Form" : "Create Form Builder";
     Layout = "~/Views/Shared/_KSEBLayout.cshtml";
 
+    var formAction = ViewBag.IsEditMode == true
+        ? $"/FormBuilder/Update/{ViewBag.FormId}"
+        : "/FormBuilder/Create";
+    var formTitle = ViewBag.IsEditMode == true ? "Edit Form" : "Create New Form";
 }
 
 <!DOCTYPE html>
@@ -11,7 +14,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Creative Form Builder</title>
+    <title>@formTitle - KSEB Form Builder</title>
 
     <!-- ============================================ -->
     <!-- EXTERNAL DEPENDENCIES -->
@@ -169,10 +172,39 @@
                 opacity: 1;
             }
         }
+
+        /* Error message styling */
+        .error-message {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease-out;
+            background: linear-gradient(to right, #ef4444, #dc2626);
+        }
     </style>
 </head>
 
 <body id="body" class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 text-gray-900">
+
+    <!-- ============================================ -->
+    <!-- SUCCESS/ERROR MESSAGES -->
+    <!-- ============================================ -->
+    @if (ViewBag.SuccessMessage != null)
+    {
+        <div class="success-message px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-check-circle"></i>
+            @ViewBag.SuccessMessage
+        </div>
+    }
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="error-message px-6 py-3 rounded-lg text-white shadow-lg flex items-center gap-2">
+            <i class="fa-solid fa-exclamation-circle"></i>
+            @ViewBag.ErrorMessage
+        </div>
+    }
 
     <!-- ============================================ -->
     <!-- MAIN APPLICATION CONTAINER -->
@@ -216,6 +248,14 @@
                         <i class="fa-solid fa-trash w-4 h-4"></i>
                         <span class="font-medium">Clear</span>
                     </button>
+
+                    <!-- View Forms Button -->
+                    <a href="/FormBuilder/List"
+                       class="flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white text-xs font-medium shadow-sm transition-all"
+                       title="View All Forms">
+                        <i class="fa-solid fa-list w-4 h-4"></i>
+                        <span class="font-medium">View Forms</span>
+                    </a>
                 </div>
             </div>
 
@@ -230,8 +270,13 @@
                 </button>
 
                 <!-- Created By Display -->
-                <div class="hidden px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-medium">
+                <div class="px-3 py-1.5 rounded-md bg-gray-100 text-gray-700 text-xs font-medium">
                     <i class="fa-solid fa-user mr-1"></i>Created by: @(User.Identity?.Name ?? "MVC-User")
+                </div>
+
+                <!-- Database Status -->
+                <div id="dbStatus" class="px-3 py-1.5 rounded-md bg-green-100 text-green-700 text-xs font-medium hidden">
+                    <i class="fa-solid fa-database mr-1"></i>DB: Connected
                 </div>
             </div>
         </header>
@@ -246,7 +291,7 @@
             <!-- ============================================ -->
             <aside id="leftSidebar" class="w-64 flex-shrink-0 border-r border-gray-200 bg-white/95 backdrop-blur-sm flex flex-col shadow-xl transition-all duration-200 ease-in-out">
                 <!-- Sidebar Header -->
-                <div class="flex items-center justify-between px-4 py-3 border-b bg-indigo-500 to-purple-600">
+                <div class="flex items-center justify-between px-4 py-3 border-b bg-gradient-to-r from-indigo-500 to-purple-600">
                     <h2 class="text-sm font-bold uppercase tracking-wide text-white flex items-center gap-2">
                         <i class="fa-solid fa-puzzle-piece"></i>
                         Form Fields
@@ -399,59 +444,36 @@
             <!-- CENTER CANVAS AREA -->
             <!-- ============================================ -->
             <main class="flex-1 min-w-0 overflow-auto hide-scrollbar">
-                <!-- Success Message -->
-                @if (ViewBag.Message != null)
-                {
-                    <div class="success-message px-6 py-3 rounded-lg bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg flex items-center gap-2">
-                        <i class="fa-solid fa-check-circle"></i>
-                        @ViewBag.Message
-                    </div>
-                }
+                <!-- ✅ FIXED: Form with proper action and antiforgery token -->
+                <form id="mainForm" method="post" action="@formAction" class="h-full">
+                    @Html.AntiForgeryToken()
 
-                <form id="mainForm" method="post" class="h-full">
                     <!-- HIDDEN INPUTS for form metadata -->
                     <input type="hidden" name="FormTitle" id="hiddenFormTitle" value="@Model?.FormTitle" />
                     <input type="hidden" name="FormDescription" id="hiddenFormDescription" value="@Model?.FormDescription" />
+                    <input type="hidden" name="CreatedBy" value="@(User.Identity?.Name ?? "MVC-User")" />
+
+                    @if (ViewBag.IsEditMode == true)
+                    {
+                        <input type="hidden" name="FormId" value="@ViewBag.FormId" />
+                    }
 
                     <div id="canvas" class="relative h-full min-h-[calc(100vh-64px)] p-8 bg-white canvas-grid transition-colors duration-200">
 
                         <!-- Empty State Message -->
                         <div id="canvasEmptyState" class="flex flex-col items-center justify-center p-12 text-center transition-all duration-700 ease-out" style="@(Model?.Fields?.Any() == true ? "display: none;" : "")">
-                            @* <div class="relative mb-8 h-32 w-48">
-                                <div class="absolute inset-0 translate-x-4 -translate-y-3 rounded-xl border-2 border-indigo-500/30 bg-gray-100/50 shadow-lg shadow-indigo-500/20 backdrop-blur-sm transition-transform duration-500">
-                                    <div class="m-3 h-2 w-1/2 rounded-full bg-indigo-500/30"></div>
-                                    <div class="mx-3 mt-4 space-y-2">
-                                        <div class="h-1.5 w-full rounded-full bg-indigo-500/20"></div>
-                                        <div class="h-1.5 w-3/4 rounded-full bg-indigo-500/20"></div>
-                                    </div>
-                                </div>
-                            </div> *@
-
-                            @* <h2 class="mb-3 text-2xl font-extrabold tracking-tight text-gray-900">
-                                Start Building Your Form
-                            </h2>
-
-                            <p class="max-w-md text-sm leading-relaxed text-gray-600 mb-6">
-                                Drag form fields from the sidebar to create your custom form.
-                            </p> *@
-
                             <!-- Form Description Input -->
                             <div class="w-full max-w-md">
-                                @* <label class="block text-sm font-medium text-gray-700 mb-2">
-                                    <i class="fa-solid fa-align-left mr-2"></i>Form Description
-                                </label> *@
                                 <textarea id="descriptionTextarea"
+                                          name="FormDescription"
                                           class="w-full px-4 py-3 rounded-lg bg-white border-2 border-gray-300 text-gray-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
-                                          rows="1"
+                                          rows="2"
                                           placeholder="Describe what this form is for...">@Model?.FormDescription</textarea>
                             </div>
                         </div>
 
                         <!-- Form Canvas Container -->
                         <div id="formCanvas" class="relative max-w-3xl mx-auto flex flex-col gap-6 drop-zone">
-                            @* <h3 class="mb-3 text-2xl font-bold tracking-tight text-gray-900 text-center">
-                                Start Building Your Form
-                            </h3> *@    
                             <!-- Existing fields will be rendered here -->
                             @if (Model?.Fields != null && Model.Fields.Any())
                             {
@@ -463,7 +485,7 @@
                                                 <i class="fa-solid fa-cube"></i>
                                                 @Model.Fields[i].FieldType Field
                                             </span>
-                                            <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <div class="flex items-center gap-2">
                                                 <button type="button" class="field-settings-btn w-6 h-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs flex items-center justify-center hover:scale-110 transition-all" title="Edit Field">
                                                     <i class="fa-solid fa-gear"></i>
                                                 </button>
@@ -613,6 +635,7 @@
         const fieldOptions = document.getElementById("fieldOptions");
         const fieldSettingsCancel = document.getElementById("fieldSettingsCancel");
         const fieldSettingsSave = document.getElementById("fieldSettingsSave");
+        const dbStatus = document.getElementById("dbStatus");
 
         // ============================================
         // APPLICATION STATE
@@ -621,6 +644,34 @@
         let currentFieldIndex = 0;
         let editingField = null;
         let draggedField = null;
+
+        // ============================================
+        // DATABASE CONNECTION TEST
+        // ============================================
+        async function testDatabaseConnection() {
+            try {
+                const response = await fetch('/FormBuilder/Test');
+                const data = await response.json();
+
+                if (data.success && data.connected) {
+                    dbStatus.classList.remove('hidden');
+                    dbStatus.classList.remove('bg-red-100', 'text-red-700');
+                    dbStatus.classList.add('bg-green-100', 'text-green-700');
+                    dbStatus.innerHTML = `<i class="fa-solid fa-database mr-1"></i>DB: Connected (${data.formCount} forms)`;
+                } else {
+                    dbStatus.classList.remove('hidden');
+                    dbStatus.classList.remove('bg-green-100', 'text-green-700');
+                    dbStatus.classList.add('bg-red-100', 'text-red-700');
+                    dbStatus.innerHTML = `<i class="fa-solid fa-database mr-1"></i>DB: Disconnected`;
+                }
+            } catch (error) {
+                console.error('Database test failed:', error);
+                dbStatus.classList.remove('hidden');
+                dbStatus.classList.remove('bg-green-100', 'text-green-700');
+                dbStatus.classList.add('bg-red-100', 'text-red-700');
+                dbStatus.innerHTML = `<i class="fa-solid fa-database mr-1"></i>DB: Connection Error`;
+            }
+        }
 
         // ============================================
         // THEME MANAGEMENT
@@ -797,7 +848,7 @@
                         <i class="fa-solid fa-cube"></i>
                         ${fieldType} Field
                     </span>
-                    <div class="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div class="flex items-center gap-2">
                         <button type="button" class="field-settings-btn w-6 h-6 rounded-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-xs flex items-center justify-center hover:scale-110 transition-all" title="Edit Field">
                             <i class="fa-solid fa-gear"></i>
                         </button>
@@ -1059,9 +1110,11 @@
             const deleteBtn = fieldElement.querySelector('.field-delete-btn');
             if (deleteBtn) {
                 deleteBtn.addEventListener('click', () => {
-                    fieldElement.remove();
-                    updateFieldIndexes();
-                    updateEmptyState();
+                    if (confirm('Are you sure you want to delete this field?')) {
+                        fieldElement.remove();
+                        updateFieldIndexes();
+                        updateEmptyState();
+                    }
                 });
             }
 
@@ -1088,7 +1141,9 @@
         // ============================================
         // EVENT LISTENERS
         // ============================================
-        themeToggle.addEventListener('click', toggleTheme);
+        if (themeToggle) {
+            themeToggle.addEventListener('click', toggleTheme);
+        }
 
         if (collapseSidebarBtn) {
             collapseSidebarBtn.addEventListener('click', function() {
@@ -1106,52 +1161,75 @@
             });
         }
 
-        clearFormBtn.addEventListener('click', clearForm);
+        if (clearFormBtn) {
+            clearFormBtn.addEventListener('click', clearForm);
+        }
 
         // Update hidden form title when user types
-        formTitleInput.addEventListener('input', function() {
-            hiddenFormTitle.value = this.value;
-        });
+        if (formTitleInput) {
+            formTitleInput.addEventListener('input', function() {
+                hiddenFormTitle.value = this.value;
+            });
+        }
 
         // Update hidden form description when user types
-        descriptionTextarea.addEventListener('input', function() {
-            hiddenFormDescription.value = this.value;
-        });
+        if (descriptionTextarea) {
+            descriptionTextarea.addEventListener('input', function() {
+                hiddenFormDescription.value = this.value;
+            });
+        }
 
-        fieldTypeSelect.addEventListener('change', function() {
-            optionsContainer.classList.toggle('hidden', this.value !== 'select');
-        });
+        if (fieldTypeSelect) {
+            fieldTypeSelect.addEventListener('change', function() {
+                optionsContainer.classList.toggle('hidden', this.value !== 'select');
+            });
+        }
 
-        fieldSettingsCancel.addEventListener('click', function() {
-            fieldSettingsModal.classList.add('hidden');
-            editingField = null;
-        });
-
-        fieldSettingsSave.addEventListener('click', saveFieldSettings);
-
-        fieldSettingsModal.addEventListener('click', function(e) {
-            if (e.target === fieldSettingsModal) {
+        if (fieldSettingsCancel) {
+            fieldSettingsCancel.addEventListener('click', function() {
                 fieldSettingsModal.classList.add('hidden');
                 editingField = null;
-            }
-        });
+            });
+        }
+
+        if (fieldSettingsSave) {
+            fieldSettingsSave.addEventListener('click', saveFieldSettings);
+        }
+
+        if (fieldSettingsModal) {
+            fieldSettingsModal.addEventListener('click', function(e) {
+                if (e.target === fieldSettingsModal) {
+                    fieldSettingsModal.classList.add('hidden');
+                    editingField = null;
+                }
+            });
+        }
 
         // Form submission validation
-        mainForm.addEventListener('submit', function(e) {
-            if (!validateForm()) {
-                e.preventDefault();
-                return false;
-            }
-            return true;
-        });
+        if (mainForm) {
+            mainForm.addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return false;
+                }
+                return true;
+            });
+        }
 
-        // Close success message after 5 seconds
+        // Close success/error messages after 5 seconds
         setTimeout(() => {
             const successMessage = document.querySelector('.success-message');
             if (successMessage) {
                 successMessage.style.transition = 'opacity 0.5s ease';
                 successMessage.style.opacity = '0';
                 setTimeout(() => successMessage.remove(), 500);
+            }
+
+            const errorMessage = document.querySelector('.error-message');
+            if (errorMessage) {
+                errorMessage.style.transition = 'opacity 0.5s ease';
+                errorMessage.style.opacity = '0';
+                setTimeout(() => errorMessage.remove(), 500);
             }
         }, 5000);
 
@@ -1164,19 +1242,30 @@
                 updateFieldCardsTheme();
             }
 
+            // Test database connection
+            testDatabaseConnection();
+
+            // Initialize drag and drop
             initializeDragAndDrop();
             attachExistingFieldEvents();
             updateEmptyState();
 
-            // Auto-hide success message after 5 seconds
-            const successMessage = document.querySelector('.success-message');
-            if (successMessage) {
-                setTimeout(() => {
+            // Auto-hide success/error messages after 5 seconds
+            setTimeout(() => {
+                const successMessage = document.querySelector('.success-message');
+                if (successMessage) {
                     successMessage.style.transition = 'opacity 0.5s ease';
                     successMessage.style.opacity = '0';
                     setTimeout(() => successMessage.remove(), 500);
-                }, 5000);
-            }
+                }
+
+                const errorMessage = document.querySelector('.error-message');
+                if (errorMessage) {
+                    errorMessage.style.transition = 'opacity 0.5s ease';
+                    errorMessage.style.opacity = '0';
+                    setTimeout(() => errorMessage.remove(), 500);
+                }
+            }, 5000);
         }
 
         // Initialize when DOM is loaded

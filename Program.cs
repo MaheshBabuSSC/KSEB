@@ -28,6 +28,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 // Register services
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<FormService>();
+builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<BaseController>(); // Register BaseController
+
 
 var app = builder.Build();
 

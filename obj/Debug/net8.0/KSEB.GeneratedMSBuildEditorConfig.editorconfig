@@ -11,69 +11,81 @@ build_property.EnforceExtendedAnalyzerRules =
 build_property._SupportedPlatformList = Linux,macOS,Windows
 build_property.RootNamespace = KSEB
 build_property.RootNamespace = KSEB
-build_property.ProjectDir = C:\Mahesh\PstgreSQL\
+build_property.ProjectDir = C:\Mahesh\KSEB\
 build_property.EnableComHosting = 
 build_property.EnableGeneratedComInterfaceComImportInterop = 
 build_property.RazorLangVersion = 8.0
 build_property.SupportLocalizedComponentNames = 
 build_property.GenerateRazorMetadataSourceChecksumAttributes = 
-build_property.MSBuildProjectDirectory = C:\Mahesh\PstgreSQL
+build_property.MSBuildProjectDirectory = C:\Mahesh\KSEB
 build_property._RazorSourceGeneratorDebug = 
 build_property.EffectiveAnalysisLevelStyle = 8.0
 build_property.EnableCodeStyleSeverity = 
 
-[C:/Mahesh/PstgreSQL/Views/Home/Index.cshtml]
+[C:/Mahesh/KSEB/Views/Home/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Home/Privacy.cshtml]
+[C:/Mahesh/KSEB/Views/Home/Privacy.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcSG9tZVxQcml2YWN5LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/KSEB/Dashboard.cshtml]
+[C:/Mahesh/KSEB/Views/KSEB/Dashboard.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxEYXNoYm9hcmQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/KSEB/FormBuilder.cshtml]
+[C:/Mahesh/KSEB/Views/KSEB/FormBuilder.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxGb3JtQnVpbGRlci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/KSEB/Index.cshtml]
+[C:/Mahesh/KSEB/Views/KSEB/FormsList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxGb3Jtc0xpc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Mahesh/KSEB/Views/KSEB/FormSubmit.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxGb3JtU3VibWl0LmNzaHRtbA==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Mahesh/KSEB/Views/KSEB/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxJbmRleC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/KSEB/NewUser.cshtml]
+[C:/Mahesh/KSEB/Views/KSEB/NewUser.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxOZXdVc2VyLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Shared/Error.cshtml]
-build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEVycm9yLmNzaHRtbA==
+[C:/Mahesh/KSEB/Views/KSEB/Profile.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxQcm9maWxlLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Shared/FormsSidebar.cshtml]
+[C:/Mahesh/KSEB/Views/KSEB/UserList.cshtml]
+build_metadata.AdditionalFiles.TargetPath = Vmlld3NcS1NFQlxVc2VyTGlzdC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Mahesh/KSEB/Views/Shared/FormsSidebar.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXEZvcm1zU2lkZWJhci5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Shared/_KSEBLayout.cshtml]
+[C:/Mahesh/KSEB/Views/Shared/_KSEBLayout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9LU0VCTGF5b3V0LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Shared/_ValidationScriptsPartial.cshtml]
+[C:/Mahesh/KSEB/Views/Shared/_ValidationScriptsPartial.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9WYWxpZGF0aW9uU2NyaXB0c1BhcnRpYWwuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Simple/Index.cshtml]
+[C:/Mahesh/KSEB/Views/Simple/Index.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2ltcGxlXEluZGV4LmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/_ViewImports.cshtml]
+[C:/Mahesh/KSEB/Views/_ViewImports.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdJbXBvcnRzLmNzaHRtbA==
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/_ViewStart.cshtml]
+[C:/Mahesh/KSEB/Views/_ViewStart.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcX1ZpZXdTdGFydC5jc2h0bWw=
 build_metadata.AdditionalFiles.CssScope = 
 
-[C:/Mahesh/PstgreSQL/Views/Shared/_Layout.cshtml]
+[C:/Mahesh/KSEB/Views/Shared/_Layout.cshtml]
 build_metadata.AdditionalFiles.TargetPath = Vmlld3NcU2hhcmVkXF9MYXlvdXQuY3NodG1s
 build_metadata.AdditionalFiles.CssScope = b-3g9qyrmaaj

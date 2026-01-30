@@ -1,258 +1,380 @@
-﻿<!DOCTYPE html>
-<html lang="en" class="light scroll-smooth" dir="ltr">
+﻿@using System.Security.Claims
+@{
+    var userName = User.FindFirstValue(ClaimTypes.Name) ?? "User";
+    var userEmail = User.FindFirstValue(ClaimTypes.Email) ?? "";
+    var userRole = User.FindFirstValue(ClaimTypes.Role) ?? "User";
+}
+<!DOCTYPE html>
+<html lang="en" class="h-full">
 <head>
     <meta charset="utf-8" />
-    <title>@ViewData["Title"] - User</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - KSEB Portal</title>
 
-    <!-- Css -->
-    <link href="~/assets/libs/simplebar/simplebar.min.css" rel="stylesheet">
-    <link href="~/assets/libs/@@iconscout/unicons/css/line.css" type="text/css" rel="stylesheet">
-    <link href="~/assets/libs/@@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" type="text/css">
-    <link rel="stylesheet" href="~/assets/css/tailwind.css">
+    <!-- Tailwind CSS -->
+    <link href="~/css/tailwind.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/css/output.css" />
+
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Custom Styles -->
+    <style>
+        .sidebar {
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-collapsed {
+            width: 70px;
+        }
+
+            .sidebar-collapsed .nav-text {
+                display: none;
+            }
+
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        /* Custom scrollbar */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+
+            .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                background: #a1a1a1;
+            }
+
+        /* Card hover effects */
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+            .card-hover:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+    </style>
+
+    @RenderSection("Styles", required: false)
 </head>
+<body class="h-full bg-gray-50">
+    <!-- Mobile sidebar backdrop -->
+    <div id="sidebarBackdrop" class="fixed inset-0 z-40 bg-gray-900 bg-opacity-50 lg:hidden hidden"></div>
 
-<body class="font-nunito text-base text-black dark:text-white dark:bg-slate-900">
-    <!-- Loader Start -->
-    <div id="preloader">
-        <div id="status">
-            <div class="spinner">
-                <div class="double-bounce1"></div>
-                <div class="double-bounce2"></div>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="sidebar fixed top-0 left-0 z-40 w-64 h-screen bg-white border-r border-gray-200 transition-all">
+        <!-- Logo -->
+        <div class="flex items-center justify-between h-16 px-6 border-b border-gray-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
+                    <i class="fas fa-bolt text-white text-lg"></i>
+                </div>
+                <span class="text-xl font-bold text-gray-800">KSEB</span>
+            </div>
+            <button id="sidebarToggle" class="lg:hidden text-gray-500 hover:text-gray-700">
+                <i class="fas fa-times text-lg"></i>
+            </button>
+        </div>
+
+        <!-- User Profile -->
+        <div class="px-6 py-4 border-b border-gray-200">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-primary-100 rounded-full flex items-center justify-center">
+                    <span class="text-primary-600 font-semibold">@userName[0]</span>
+                </div>
+                <div>
+                    <p class="font-medium text-gray-800">@userName</p>
+                    <p class="text-sm text-gray-500">@userRole</p>
+                </div>
             </div>
         </div>
-    </div>
-    <!-- Loader End -->
 
-    <div class="page-wrapper toggled">
-        <!-- sidebar-wrapper -->
-        <nav id="sidebar" class="sidebar-wrapper sidebar-light">
-            <div class="sidebar-content">
-                <div class="sidebar-brand" style="background-color:#25159d; padding: 20px 0;">
-                    <div class="text-center">
-                       
-                        <img class="mt-3 mx-auto w-24" src="~/assets/images/kseblogo.png" />
-                    </div>
-                </div>
-
-                <ul class="sidebar-menu border-t border-white/10" data-simplebar style="height: calc(100% - 70px);">
-                    <li>
-                        <a asp-controller="Dashboard" asp-action="Index">
-                            <i class="uil uil-chart-line me-2"></i>Dashboard
-                        </a>
-                    </li>
-
-                    <!-- User Profile Dropdown -->
-                    <li class="sidebar-dropdown">
-                        <a href="javascript:void(0)">
-                            <i class="uil uil-user me-2"></i>Users
-                        </a>
-                        <div class="sidebar-submenu">
-                            <ul>
-                                <li><a href="@Url.Action("NewUser", "KSEB")">New User</a></li>
-                                <li><a href="@Url.Action("UserList", "KSEB")">User List</a></li>
-
-                                @* <li><a href="#">User list</a></li> *@
-                                <li><a href="#">Role</a></li>
-                            </ul>
-                        </div>
-                    </li>
-
-                    <!-- Forms Dropdown -->
-                    <li class="sidebar-dropdown">
-                        <a href="javascript:void(0)"><i class="uil uil-file-alt me-2"></i>Forms</a>
-                        <div class="sidebar-submenu">
-                            <ul>
-                                <li><a href="@Url.Action("FormBuilder", "KSEB")">New Form</a></li>
-                                <li><a href="@Url.Action("FormsList", "KSEB")">Forms List</a></li>
-
-                            </ul>
-                        </div>
-                    </li>
-
-                    <!-- Forms Section with count -->
-                    @* <li class="sidebar-section mt-4 pt-4 border-t border-white/10">
-                        <div class="flex justify-between items-center px-4 py-2">
-                            <span class="text-sm font-semibold text-gray-500 dark:text-gray-400">FORMS (4)</span>
-                        </div>
-                    </li> *@
-
-                    <!-- Include FormsSidebar partial - This will show individual forms -->
-                    @{
-                        var sidebarForms = ViewBag.SidebarForms as List<KSEB.Models.FormSummary>;
-                    }
-                    @if (sidebarForms == null)
-                    {
-                        sidebarForms = new List<KSEB.Models.FormSummary>();
-                    }
-                    @await Html.PartialAsync("FormsSidebar", sidebarForms)
-
-                </ul>
-                <!-- sidebar-menu  -->
-                <!-- Logout Button at bottom -->
-                <div class="p-4 border-t border-white/10">
-                    <a asp-controller="User" asp-action="Logout"
-                       class="flex items-center justify-center gap-2 px-4 py-2 bg-red-600 rounded text-center hover:bg-red-700 transition-colors text-white">
-                        <i class="uil uil-sign-out-alt"></i>
-                        <span>Logout</span>
+        <!-- Navigation -->
+        <nav class="flex-1 px-4 py-6 overflow-y-auto custom-scrollbar">
+            <ul class="space-y-1">
+                <li>
+                    <a href="/Dashboard" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg @(ViewContext.RouteData.Values["Action"]?.ToString() == "Dashboard" ? "bg-primary-50 text-primary-600" : "")">
+                        <i class="fas fa-tachometer-alt w-5 mr-3"></i>
+                        <span class="nav-text">Dashboard</span>
                     </a>
-                </div>
-            </div>
-        </nav>
-        <!-- sidebar-wrapper  -->
-        <!-- Start Page Content -->
-        <main class="page-content bg-gray-50 dark:bg-slate-800">
-            <!-- Top Header -->
-            <div class="top-header">
-                <div class="header-bar flex justify-between items-center px-6 py-3">
-                    <div class="flex items-center space-x-4">
-                        <!-- show or close sidebar -->
-                        <a id="close-sidebar" class="h-8 w-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-100 dark:border-gray-800 text-slate-900 dark:text-white rounded-full" href="javascript:void(0)">
-                            <i data-feather="menu" class="h-4 w-4"></i>
-                        </a>
+                </li>
 
-                        <!-- Page Title -->
-                        <h1 class="text-lg font-semibold text-slate-900 dark:text-white">
-                            @ViewData["Title"]
-                        </h1>
+                <li class="pt-4">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">Management</p>
+                </li>
+
+                <li>
+                    <a href="/Register" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg @(ViewContext.RouteData.Values["Action"]?.ToString() == "Register" ? "bg-primary-50 text-primary-600" : "")">
+                        <i class="fas fa-user-plus w-5 mr-3"></i>
+                        <span class="nav-text">create User</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/UserList" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg">
+                        <i class="fas fa-users w-5 mr-3"></i>
+                        <span class="nav-text">Users List</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/FormBuilder" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg">
+                        <i class="fas fa-users w-5 mr-3"></i>
+                        <span class="nav-text">Form Builder</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/FormsList" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg">
+                        <i class="fas fa-users w-5 mr-3"></i>
+                        <span class="nav-text">Forms List</span>
+                    </a>
+                </li>
+
+                @* <li class="pt-4">
+                    <p class="px-4 text-xs font-semibold text-gray-400 uppercase tracking-wider">System</p>
+                </li> *@
+
+              @*   <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg">
+                        <i class="fas fa-cog w-5 mr-3"></i>
+                        <span class="nav-text">Settings</span>
+                    </a>
+                </li> *@
+
+                <!-- ADD THIS LINE TO INCLUDE FORMS LAYOUT -->
+                <li>
+                <li>
+                    @await Html.PartialAsync("FormsSidebar")
+                </li>                </li>
+
+                <li>
+                    <a href="#" class="flex items-center px-4 py-3 text-gray-700 hover:bg-primary-50 hover:text-primary-600 rounded-lg">
+                        <i class="fas fa-question-circle w-5 mr-3"></i>
+                        <span class="nav-text">Help & Support</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Logout -->
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-gray-200">
+            <a href="/Logout" class="flex items-center justify-center px-4 py-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-lg">
+                <i class="fas fa-sign-out-alt w-5 mr-2"></i>
+                <span class="nav-text">Logout</span>
+            </a>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-content h-full lg:ml-64">
+        <!-- Top Header -->
+        <header class="sticky top-0 z-30 bg-white border-b border-gray-200">
+            <div class="flex items-center justify-between h-16 px-6">
+                <!-- Left: Mobile menu toggle -->
+                <button id="mobileMenuToggle" class="lg:hidden text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-bars text-lg"></i>
+                </button>
+
+                <!-- Center: Breadcrumbs -->
+                <div class="hidden md:flex items-center space-x-2 text-sm">
+                    <a href="/Dashboard" class="text-gray-500 hover:text-primary-600">Dashboard</a>
+                    <i class="fas fa-chevron-right text-gray-400 text-xs"></i>
+                    <span class="text-gray-800">@ViewData["Title"]</span>
+                </div>
+
+                <!-- Right: User menu & notifications -->
+                <div class="flex items-center space-x-4">
+                    <!-- Notifications -->
+                    <div class="relative">
+                        <button id="notificationsToggle" class="relative text-gray-500 hover:text-gray-700">
+                            <i class="fas fa-bell text-lg"></i>
+                            <span class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-xs rounded-full flex items-center justify-center">3</span>
+                        </button>
+
+                        <!-- Notifications dropdown -->
+                        <div id="notificationsDropdown" class="absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+                            <div class="p-4 border-b border-gray-200">
+                                <h3 class="font-semibold text-gray-800">Notifications</h3>
+                            </div>
+                            <div class="max-h-96 overflow-y-auto">
+                                <!-- Notification items -->
+                            </div>
+                        </div>
                     </div>
 
-                    <ul class="list-none mb-0 space-x-1">
-                        <!-- User/Profile Dropdown -->
-                        <li class="dropdown inline-block relative">
-                            <button data-dropdown-toggle="dropdown" class="dropdown-toggle items-center" type="button">
-                                <span class="h-8 w-8 inline-flex items-center justify-center tracking-wide align-middle duration-500 text-[20px] text-center bg-gray-50 dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 border border-gray-100 dark:border-gray-800 text-slate-900 dark:text-white rounded-full">
-                                    <i class="uil uil-user text-sm"></i>
-                                </span>
-                                <span class="font-semibold text-[16px] ms-1 sm:inline-block hidden">Admin</span>
-                            </button>
-                            <!-- Dropdown menu -->
-                            <div class="dropdown-menu absolute end-0 m-0 mt-4 z-10 w-44 rounded-md overflow-hidden bg-white dark:bg-slate-900 shadow dark:shadow-gray-700 hidden" onclick="event.stopPropagation();">
-                                <ul class="py-2 text-start">
-                                    <li>
-                                        <a href="profile.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-user me-2"></i>Profile</a>
-                                    </li>
-                                    @* <li>
-                                        <a href="chat.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-comment me-2"></i>Chat</a>
-                                    </li>
-                                    <li>
-                                        <a href="email.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-envelope me-2"></i>Email</a>
-                                    </li>
-                                    <li>
-                                        <a href="profile-setting.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-setting me-2"></i>Settings</a>
-                                    </li>
-                                    <li class="border-t border-gray-100 dark:border-gray-800 my-2"></li>
-                                    <li>
-                                        <a href="lock-screen.html" class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white"><i class="uil uil-lock me-2"></i>Lockscreen</a>
-                                    </li> *@
-                                    <li>
-                                        <a asp-controller="KSEB"
-                                           asp-action="Logout"
-                                           class="block font-medium py-1 px-4 dark:text-white/70 hover:text-indigo-600 dark:hover:text-white">
-                                            <i class="uil uil-sign-out-alt me-2"></i>Logout
-                                        </a>
-                                    </li>
-                                </ul>
+                    <!-- User dropdown -->
+                    <div class="relative">
+                        <button id="userMenuToggle" class="flex items-center space-x-2 text-gray-700 hover:text-gray-900">
+                            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                                <span class="text-primary-600 font-semibold text-sm">@userName[0]</span>
                             </div>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-            <!-- Top Header -->
+                            <span class="hidden md:inline font-medium">@userName</span>
+                            <i class="fas fa-chevron-down text-xs"></i>
+                        </button>
 
-            <div class="container-fluid relative px-3">
-                <div class="layout-specing">
-                    <!-- Start Content -->
-                    @RenderBody()
-                    <!-- End Content -->
-                </div>
-            </div><!--end container-->
-            <!-- Footer Start -->
-            <footer class="shadow dark:shadow-gray-700 bg-white dark:bg-slate-900 px-6 py-4">
-                <div class="container-fluid">
-                    <div class="grid grid-cols-1">
-                        <div class="sm:text-start text-center mx-md-2">
-                            <p class="mb-0 text-slate-400">
-                                © <script>document.write(new Date().getFullYear())</script>
-                                KSEBL. Designed & Developed By
-                                <a href="#" target="_blank" class="text-reset">SCS Tech India</a>.
-                            </p>
+                        <!-- User dropdown menu -->
+                        <div id="userDropdown" class="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 hidden z-50">
+                            <div class="py-2">
+                                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-user w-4 mr-3"></i>
+                                    <span>Profile</span>
+                                </a>
+                                <a href="#" class="flex items-center px-4 py-2 text-gray-700 hover:bg-gray-100">
+                                    <i class="fas fa-cog w-4 mr-3"></i>
+                                    <span>Settings</span>
+                                </a>
+                                <div class="border-t border-gray-200 my-1"></div>
+                                <a href="/Logout" class="flex items-center px-4 py-2 text-red-600 hover:bg-red-50">
+                                    <i class="fas fa-sign-out-alt w-4 mr-3"></i>
+                                    <span>Logout</span>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </footer>
+            </div>
+        </header>
+
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto custom-scrollbar p-6">
+            <!-- Page header -->
+            <div class="mb-6">
+                <h1 class="text-2xl font-bold text-gray-800">@ViewData["Title"]</h1>
+                <p class="text-gray-600 mt-1">@ViewData["Description"]</p>
+            </div>
+
+            <!-- Alert Messages -->
+            @if (TempData["SuccessMessage"] != null)
+            {
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                        <p class="text-green-800">@TempData["SuccessMessage"]</p>
+                    </div>
+                </div>
+            }
+
+            @if (TempData["ErrorMessage"] != null)
+            {
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <div class="flex items-center">
+                        <i class="fas fa-exclamation-circle text-red-600 mr-3"></i>
+                        <p class="text-red-800">@TempData["ErrorMessage"]</p>
+                    </div>
+                </div>
+            }
+
+            <!-- Main content -->
+            @RenderBody()
         </main>
+
+        <!-- Footer -->
+        <footer class="bg-white border-t border-gray-200 py-4 px-6">
+            <div class="flex flex-col md:flex-row justify-between items-center">
+                <div class="text-gray-600 text-sm">
+                    &copy; @DateTime.Now.Year KSEB Portal. All rights reserved.
+                </div>
+                <div class="text-gray-500 text-sm mt-2 md:mt-0">
+                    <span class="mr-4">v1.0.0</span>
+                    <span>Powered by ASP.NET Core</span>
+                </div>
+            </div>
+        </footer>
     </div>
 
-    <!-- JAVASCRIPTS -->
-    <script src="~/assets/libs/feather-icons/feather.min.js"></script>
-    <script src="~/assets/libs/simplebar/simplebar.min.js"></script>
-    <script src="~/assets/js/plugins.init.js"></script>
-    <script src="~/assets/js/app.js"></script>
-
+    <!-- JavaScript -->
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize feather icons
-            if (typeof feather !== 'undefined') {
-                feather.replace();
-            }
-
-            // Hide preloader
-            setTimeout(function() {
-                const preloader = document.getElementById('preloader');
-                if (preloader) {
-                    preloader.style.display = 'none';
-                }
-            }, 500);
-
             // Sidebar toggle
-            const closeSidebarBtn = document.getElementById('close-sidebar');
-            if (closeSidebarBtn) {
-                closeSidebarBtn.addEventListener('click', function() {
-                    document.querySelector('.page-wrapper').classList.toggle('toggled');
-                });
-            }
+            const sidebar = document.getElementById('sidebar');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+            const sidebarBackdrop = document.getElementById('sidebarBackdrop');
 
-            // Dropdown toggle
-            document.querySelectorAll('[data-dropdown-toggle="dropdown"]').forEach(function(button) {
-                button.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const dropdown = this.nextElementSibling;
-                    dropdown.classList.toggle('hidden');
-                });
+            // Mobile menu toggle
+            mobileMenuToggle.addEventListener('click', function() {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarBackdrop.classList.remove('hidden');
             });
 
-            // Close dropdown when clicking outside
+            // Close sidebar
+            sidebarToggle.addEventListener('click', function() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarBackdrop.classList.add('hidden');
+            });
+
+            // Close sidebar on backdrop click
+            sidebarBackdrop.addEventListener('click', function() {
+                sidebar.classList.add('-translate-x-full');
+                sidebarBackdrop.classList.add('hidden');
+            });
+
+            // Desktop sidebar collapse
+            const desktopSidebarToggle = document.createElement('button');
+            desktopSidebarToggle.innerHTML = '<i class="fas fa-chevron-left"></i>';
+            desktopSidebarToggle.className = 'absolute -right-3 top-6 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-sm flex items-center justify-center text-gray-500 hover:text-gray-700 hidden lg:flex';
+            desktopSidebarToggle.addEventListener('click', function() {
+                sidebar.classList.toggle('sidebar-collapsed');
+                document.querySelector('.main-content').classList.toggle('lg:ml-64');
+                document.querySelector('.main-content').classList.toggle('lg:ml-20');
+            });
+            sidebar.appendChild(desktopSidebarToggle);
+
+            // Dropdown toggles
+            const userMenuToggle = document.getElementById('userMenuToggle');
+            const userDropdown = document.getElementById('userDropdown');
+            const notificationsToggle = document.getElementById('notificationsToggle');
+            const notificationsDropdown = document.getElementById('notificationsDropdown');
+
+            userMenuToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                userDropdown.classList.toggle('hidden');
+                notificationsDropdown.classList.add('hidden');
+            });
+
+            notificationsToggle.addEventListener('click', function(e) {
+                e.stopPropagation();
+                notificationsDropdown.classList.toggle('hidden');
+                userDropdown.classList.add('hidden');
+            });
+
+            // Close dropdowns when clicking outside
             document.addEventListener('click', function() {
-                document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
-                    menu.classList.add('hidden');
-                });
+                userDropdown.classList.add('hidden');
+                notificationsDropdown.classList.add('hidden');
             });
 
-            // Sidebar dropdown toggle
-            document.querySelectorAll('.sidebar-dropdown > a').forEach(function(dropdown) {
-                dropdown.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const parent = this.parentElement;
-                    parent.classList.toggle('active');
-
-                    // Toggle chevron icon
-                    const icon = this.querySelector('.uil');
-                    if (parent.classList.contains('active')) {
-                        if (icon.classList.contains('uil-angle-down')) {
-                            icon.classList.remove('uil-angle-down');
-                            icon.classList.add('uil-angle-up');
-                        }
-                    } else {
-                        if (icon.classList.contains('uil-angle-up')) {
-                            icon.classList.remove('uil-angle-up');
-                            icon.classList.add('uil-angle-down');
-                        }
-                    }
-                });
+            // Prevent dropdowns from closing when clicking inside
+            userDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
             });
+
+            notificationsDropdown.addEventListener('click', function(e) {
+                e.stopPropagation();
+            });
+
+            // Auto-hide alerts after 5 seconds
+            setTimeout(function() {
+                document.querySelectorAll('[class*="bg-green-50"], [class*="bg-red-50"]').forEach(function(alert) {
+                    alert.style.transition = 'opacity 0.5s';
+                    alert.style.opacity = '0';
+                    setTimeout(function() {
+                        alert.remove();
+                    }, 500);
+                });
+            }, 5000);
         });
     </script>
+
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

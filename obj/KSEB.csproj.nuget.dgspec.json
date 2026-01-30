@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Mahesh\\PstgreSQL\\KSEB.csproj": {}
+    "C:\\Mahesh\\KSEB\\KSEB.csproj": {}
   },
   "projects": {
-    "C:\\Mahesh\\PstgreSQL\\KSEB.csproj": {
+    "C:\\Mahesh\\KSEB\\KSEB.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Mahesh\\PstgreSQL\\KSEB.csproj",
+        "projectUniqueName": "C:\\Mahesh\\KSEB\\KSEB.csproj",
         "projectName": "KSEB",
-        "projectPath": "C:\\Mahesh\\PstgreSQL\\KSEB.csproj",
+        "projectPath": "C:\\Mahesh\\KSEB\\KSEB.csproj",
         "packagesPath": "C:\\Users\\Lenovo\\.nuget\\packages\\",
-        "outputPath": "C:\\Mahesh\\PstgreSQL\\obj\\",
+        "outputPath": "C:\\Mahesh\\KSEB\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -51,6 +51,10 @@
         "net8.0": {
           "targetAlias": "net8.0",
           "dependencies": {
+            "Dapper": {
+              "target": "Package",
+              "version": "[2.1.66, )"
+            },
             "Microsoft.EntityFrameworkCore.Tools": {
               "include": "Runtime, Build, Native, ContentFiles, Analyzers, BuildTransitive",
               "suppressParent": "All",

@@ -1,0 +1,272 @@
+﻿@model KSEB.Models.DynamicFormViewModel
+
+@{
+    // ViewData["Title"] = "Model.FormTitle";
+    Layout = "~/Views/Shared/_KSEBLayout.cshtml";
+}
+
+<div class="container mx-auto px-4 py-8 max-w-6xl">
+    <!-- Form Header -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-6">
+        <div class="flex items-start justify-between mb-6">
+            <div>
+                <h1 class="text-2xl font-bold text-gray-900">@Model.FormTitle</h1>
+                @if (!string.IsNullOrEmpty(Model.FormDescription))
+                {
+                    <p class="text-gray-600 mt-2">@Model.FormDescription</p>
+                }
+                <div class="flex items-center gap-4 mt-4 text-sm text-gray-500">
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-hashtag"></i>
+                        <span>Form ID: @Model.FormId</span>
+                    </div>
+                    <div class="flex items-center gap-1">
+                        <i class="fas fa-asterisk text-red-500"></i>
+                        <span>Required fields are marked with *</span>
+                    </div>
+                </div>
+            </div>
+            <div class="bg-primary-50 text-primary-700 px-4 py-2 rounded-lg">
+                <i class="fas fa-file-alt mr-2"></i>
+                <span>Form Submission</span>
+            </div>
+        </div>
+
+        <!-- Success/Error Messages -->
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-check-circle text-green-600 mr-3"></i>
+                    <p class="text-green-800">@TempData["SuccessMessage"]</p>
+                </div>
+            </div>
+        }
+
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                <div class="flex items-center">
+                    <i class="fas fa-exclamation-circle text-red-600 mr-3"></i>
+                    <p class="text-red-800">@TempData["ErrorMessage"]</p>
+                </div>
+            </div>
+        }
+    </div>
+
+    <!-- Form Content -->
+    <form method="post" asp-action="SubmitFormData" asp-controller="FormBuilder" asp-route-id="@Model.FormId"
+ class="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="FormId" value="@Model.FormId" />
+        <input type="hidden" name="TableName" value="@Model.TableName" />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @{
+                var fields = Model.Fields.OrderBy(f => f.Order).ToList();
+                for (int i = 0; i < fields.Count; i++)
+                {
+                    var field = fields[i];
+                    var isFullWidth = field.Type == "textarea" || field.Type == "richtext";
+
+                    <div class="@(isFullWidth ? "md:col-span-2" : "")">
+                        <label for="@field.Name" class="block text-sm font-medium text-gray-700 mb-2">
+                            @field.Label
+                            @if (field.Required)
+                            {
+                                <span class="text-red-500 ml-1">*</span>
+                            }
+                        </label>
+
+                        @if (field.Type == "text" || field.Type == "number" || field.Type == "date" || field.Type == "email" || field.Type == "tel")
+                        {
+                            <input type="@field.Type"
+                                   id="@field.Name"
+                                   name="@field.Name"
+                                   @(field.Required ? "required" : "")
+                                   placeholder="@field.Placeholder"
+                                   class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"
+                                   @if (field.Type == "date")
+                                {
+                                       <text> max="@DateTime.Now.ToString("yyyy-MM-dd")" </text>
+                                   }
+             />
+                        }
+                        else if (field.Type == "textarea")
+                        {
+                            <textarea id="@field.Name"
+                          name="@field.Name"
+                          rows="4"
+                          @(field.Required ? "required" : "")
+                          placeholder="@field.Placeholder"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition"></textarea>
+                        }
+                        else if (field.Type == "dropdown")
+                        {
+                            <select id="@field.Name"
+                                    name="@field.Name"
+                                    @(field.Required ? "required" : "")
+                                    class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition">
+                                <option value="">-- Select @field.Label --</option>
+                                @foreach (var option in field.Options)
+                                {
+                                    <option value="@option">@option</option>
+                                }
+                            </select>
+                        }
+                        else if (field.Type == "checkbox")
+                        {
+                            <div class="flex items-center">
+                                <input type="checkbox"
+                                       id="@field.Name"
+                                       name="@field.Name"
+                                       value="true"
+                                       class="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500" />
+                                <label for="@field.Name" class="ml-2 text-gray-700">@field.Label</label>
+                            </div>
+                        }
+                        else if (field.Type == "radio")
+                        {
+                            <div class="space-y-2">
+                                @foreach (var option in field.Options)
+                                {
+                                    <div class="flex items-center">
+                                        <input type="radio"
+                                               id="@field.Name-@option"
+                                               name="@field.Name"
+                                               value="@option"
+                                               class="w-4 h-4 text-primary-600 border-gray-300 focus:ring-primary-500" />
+                                        <label for="@field.Name-@option" class="ml-2 text-gray-700">@option</label>
+                                    </div>
+                                }
+                            </div>
+                        }
+
+                        @if (!string.IsNullOrEmpty(field.Placeholder) && field.Type != "checkbox" && field.Type != "radio")
+                        {
+                            <p class="text-sm text-gray-500 mt-1">@field.Placeholder</p>
+                        }
+                    </div>
+                }
+            }
+        </div>
+
+        <!-- Form Actions -->
+        <div class="mt-8 pt-8 border-t border-gray-200 flex justify-between items-center">
+            <div class="text-sm text-gray-500">
+                <i class="fas fa-info-circle mr-1"></i>
+                All submissions are recorded and timestamped.
+            </div>
+            <div class="flex gap-3">
+                <a asp-controller="FormsList" asp-action="List"
+                   class="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition">
+                    <i class="fas fa-arrow-left mr-2"></i>Back to Forms
+                </a>
+                <button type="submit"
+                        class="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition flex items-center">
+                    <i class="fas fa-paper-plane mr-2"></i>Submit Form
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Form Info -->
+    <div class="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">Form Information</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-lg border">
+                <p class="text-sm text-gray-500">Form ID</p>
+                <p class="font-medium">@Model.FormId</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <p class="text-sm text-gray-500">Total Fields</p>
+                <p class="font-medium">@Model.Fields.Count</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg border">
+                <p class="text-sm text-gray-500">Required Fields</p>
+                <p class="font-medium">@Model.Fields.Count(f => f.Required)</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Date field restrictions
+            const dateInputs = document.querySelectorAll('input[type="date"]');
+            dateInputs.forEach(input => {
+                input.max = new Date().toISOString().split('T')[0];
+            });
+
+            // Character counter for textareas
+            const textareas = document.querySelectorAll('textarea');
+            textareas.forEach(textarea => {
+                const counter = document.createElement('div');
+                counter.className = 'text-xs text-gray-500 mt-1 text-right';
+                counter.innerHTML = `Characters: <span>${textarea.value.length}</span>`;
+
+                textarea.parentNode.appendChild(counter);
+
+                textarea.addEventListener('input', function() {
+                    counter.querySelector('span').textContent = this.value.length;
+                });
+            });
+
+            // Form submission confirmation
+            const form = document.querySelector('form');
+            form.addEventListener('submit', function(e) {
+                // Validate required fields
+                const requiredFields = form.querySelectorAll('[required]');
+                let isValid = true;
+                let firstInvalidField = null;
+
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        if (!firstInvalidField) {
+                            firstInvalidField = field;
+                        }
+
+                        // Highlight invalid field
+                        field.classList.add('border-red-500');
+                        field.classList.remove('border-gray-300');
+
+                        // Add error message
+                        let errorMsg = field.parentNode.querySelector('.field-error');
+                        if (!errorMsg) {
+                            errorMsg = document.createElement('p');
+                            errorMsg.className = 'text-red-500 text-sm mt-1 field-error';
+                            errorMsg.textContent = 'This field is required';
+                            field.parentNode.appendChild(errorMsg);
+                        }
+                    } else {
+                        field.classList.remove('border-red-500');
+                        field.classList.add('border-gray-300');
+
+                        // Remove error message
+                        const errorMsg = field.parentNode.querySelector('.field-error');
+                        if (errorMsg) {
+                            errorMsg.remove();
+                        }
+                    }
+                });
+
+                if (!isValid) {
+                    e.preventDefault();
+                    firstInvalidField.focus();
+
+                    // Show alert
+                    alert('Please fill all required fields marked with *');
+                    return false;
+                }
+
+                // Show loading state
+                const submitBtn = form.querySelector('button[type="submit"]');
+                const originalText = submitBtn.innerHTML;
+                submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Submitting...';
+                submitBtn.disabled = true;
+            });
+        });
+    </script>
+}

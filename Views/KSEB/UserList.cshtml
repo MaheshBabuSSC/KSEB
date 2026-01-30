@@ -1,0 +1,29 @@
+﻿@model List<UsersList>
+@{
+    ViewData["Title"] = "Users List";
+    Layout = "~/Views/Shared/_KSEBLayout.cshtml";
+}
+
+<h2>Users List from Function</h2>
+
+<table border="1">
+    <tr>
+        <th>ID</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Mobile</th>
+        <th>Site</th>
+        <th>Status</th>
+    </tr>
+    @foreach (var user in Model)
+    {
+        <tr>
+            <td>@user.UserId</td>
+            <td>@user.FullName</td>
+            <td>@user.Email</td>
+            <td>@user.MobileNo</td>
+            <td>@user.Site</td>
+            <td>@(user.IsActive ? "Active" : "Inactive")</td>
+        </tr>
+    }
+</table>

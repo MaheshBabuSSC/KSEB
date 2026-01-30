@@ -6,7 +6,14 @@ module.exports = {
         "./Components/**/*.{cshtml,html}",
     ],
     theme: {
-        extend: {},
+        extend: {
+            colors: {
+                'kseb-blue': '#0056b3',
+                'kseb-green': '#28a745',
+                'kseb-yellow': '#ffc107',
+                'kseb-red': '#dc3545',
+            },
+        },
     },
     plugins: [],
 }
